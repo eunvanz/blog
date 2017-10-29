@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>방구석엔지니어</title>
+    <description>밥값하는 그날까지, 삽질은 계속된다.
+</description>
+    <link>https://eunvanz.github.io/</link>
+    <atom:link href="https://eunvanz.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 29 Oct 2017 19:42:08 +0900</pubDate>
+    <lastBuildDate>Sun, 29 Oct 2017 19:42:08 +0900</lastBuildDate>
+    <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>Welcome to Jekyll!</title>
+        <description>&lt;p&gt;테스트&lt;/p&gt;
+</description>
+        <pubDate>Sun, 29 Oct 2017 17:44:03 +0900</pubDate>
+        <link>https://eunvanz.github.io/javascript/2017/10/29/test.html</link>
+        <guid isPermaLink="true">https://eunvanz.github.io/javascript/2017/10/29/test.html</guid>
+        
+        <category>jekyll</category>
+        
+        <category>welcome</category>
+        
+        
+        <category>javascript</category>
+        
+      </item>
+    
+  </channel>
+</rss>
