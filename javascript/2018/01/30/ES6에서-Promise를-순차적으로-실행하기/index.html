@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>ES6에서 Promise를 순차적으로 실행하기</title>
+  <meta name="description" content="Promise는 javascript의 비동기 호출 시 펼쳐지는 callback지옥을 해소할 수 있는 아주 유용한 ES6 객체이다. 현재 존재하는 Promise의 함수 중에서 여러 Promise 함수들을 한꺼번에 handling 할 수 있도록 해주는 함수로 Promise.all()이...">
+  
+  <meta name="author" content="CIVASOUL">
+  <meta name="copyright" content="&copy; CIVASOUL 2018">
+  
+  <meta name="naver-site-verification" content="245b5c2c0ed77124722421201ab3f63eb6d7b143" />
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="https://eunvanz.github.io/javascript/2018/01/30/ES6%EC%97%90%EC%84%9C-Promise%EB%A5%BC-%EC%88%9C%EC%B0%A8%EC%A0%81%EC%9C%BC%EB%A1%9C-%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0/">
+  <link rel="alternate" type="application/rss+xml" title="방구석엔지니어" href="https://eunvanz.github.io/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/" class="logo">
+      
+      <img src="/assets/logo.png" alt="방구석엔지니어">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container has-cover" style="background-image: url(/assets/javascript-code.jpg);">
+  <div class="scrim has-cover">
+    <header class="post-header">
+      <h1 class="title">ES6에서 Promise를 순차적으로 실행하기</h1>
+      <p class="info">by <strong>방구석엔지니어</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+
+
+<section class="post-meta">
+  <div class="post-date">January 30, 2018</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/category/javascript">Javascript</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>Promise는 javascript의 비동기 호출 시 펼쳐지는 callback지옥을 해소할 수 있는 아주 유용한 ES6 객체이다. 현재 존재하는 Promise의 함수 중에서 여러 Promise 함수들을 한꺼번에 handling 할 수 있도록 해주는 함수로 <code class="highlighter-rouge">Promise.all()</code>이라는 함수가 있지만, 이 함수는 Promise 함수들을 순차적으로 실행시켜 주지는 않는다.</p>
+
+<p>예를 들어, 정렬되어 있는 순서대로 순차적으로 DB에 입력되어야 하는 <code class="highlighter-rouge">items</code>라는 Object 배열이 있다. 순차적으로 DB에 입력한다는 조건을 무시한다면 <code class="highlighter-rouge">Promise.all()</code>을 사용하여 아래와 같이 코드를 짤 수 있을 것이다.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">axios</span> <span class="nx">from</span> <span class="s1">'axios'</span>
+<span class="kr">import</span> <span class="p">{</span> <span class="nx">API_BASE_URL</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'./constant'</span>
+
+<span class="kr">const</span> <span class="nx">items</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s1">'firstItem'</span><span class="p">,</span> <span class="na">seq</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s1">'secondItem'</span><span class="p">,</span> <span class="na">seq</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s1">'thirdItem'</span><span class="p">,</span> <span class="na">seq</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+  <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s1">'fourthItem'</span><span class="p">,</span> <span class="na">seq</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+<span class="p">]</span>
+
+<span class="kr">const</span> <span class="nx">postItem</span> <span class="o">=</span> <span class="nx">item</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">axios</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">API_BASE_URL</span><span class="p">}</span><span class="sr">/item`, item</span><span class="err">)
+</span><span class="p">}</span>
+
+<span class="kr">const</span> <span class="nx">promArr</span> <span class="o">=</span> <span class="nx">items</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">item</span> <span class="o">=&gt;</span> <span class="nx">postItem</span><span class="p">(</span><span class="nx">item</span><span class="p">))</span>
+
+<span class="nx">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">promArr</span><span class="p">)</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// 성공 후 처리</span>
+<span class="p">})</span>
+</code></pre>
+</div>
+
+<p>위 코드는 얼핏보면 정렬된 <code class="highlighter-rouge">items</code>에 대하여 순차적으로 <code class="highlighter-rouge">postItem</code>함수가 호출되고 db에 순차적으로 입력될 것 같지만, 각 함수들은 병렬적으로 실행되어 결국에는 뒤죽박죽으로 입력된다. 비동기이기 때문에 각 함수들이 수행되는 시간이 일정하지 않기 때문이다. 즉, 순서가 보장되지 않는다. 순서를 보장하기 위해서는 아래와 같이 코드를 고쳐야 한다.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">postItem</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">postItem</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">postItem</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">postItem</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// 성공 후 처리</span>
+<span class="p">})</span>
+</code></pre>
+</div>
+
+<p>하지만, 이 코드는 <code class="highlighter-rouge">items</code>의 length가 클 경우에 사용할 수가 없다.</p>
+
+<h1 id="reduce---promise--"><code class="highlighter-rouge">reduce()</code>를 활용하여 순차적으로 Promise 함수 실행하기</h1>
+<p>이 문제는 <code class="highlighter-rouge">Array.prototype.reduce()</code>함수를 활용하면 간단히 해결 가능하다. <code class="highlighter-rouge">Array.prototype.reduce()</code>함수의 자세한 설명은 <a href="https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce">이곳</a>을 참고하자.</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">items</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">prevProm</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">prevProm</span><span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">postItem</span><span class="p">(</span><span class="nx">item</span><span class="p">))</span>
+<span class="p">},</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">())</span>
+<span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// 성공 후 처리</span>
+<span class="p">})</span>
+</code></pre>
+</div>
+
+<p>이와 같은 방법으로 아주 간단하게 순차적으로 여러 Promise 함수를 처리할 수 있다.</p>
+
+
+</article>
+
+
+
+<section class="tags">
+  <strong>Tags:</strong> <a href="/tag/javascript">javascript</a>,&nbsp;<a href="/tag/es6">es6</a>
+</section>
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+      <a href="//twitter.com/share?text=ES6%EC%97%90%EC%84%9C+Promise%EB%A5%BC+%EC%88%9C%EC%B0%A8%EC%A0%81%EC%9C%BC%EB%A1%9C+%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0&url=https%3A%2F%2Feunvanz.github.io%2Fjavascript%2F2018%2F01%2F30%2FES6%25EC%2597%2590%25EC%2584%259C-Promise%25EB%25A5%25BC-%25EC%2588%259C%25EC%25B0%25A8%25EC%25A0%2581%25EC%259C%25BC%25EB%25A1%259C-%25EC%258B%25A4%25ED%2596%2589%25ED%2595%2598%25EA%25B8%25B0%2F&via="
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+        <i class="fa fa-twitter-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+      <a href="//www.facebook.com/sharer.php?t=ES6%EC%97%90%EC%84%9C+Promise%EB%A5%BC+%EC%88%9C%EC%B0%A8%EC%A0%81%EC%9C%BC%EB%A1%9C+%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0&u=https%3A%2F%2Feunvanz.github.io%2Fjavascript%2F2018%2F01%2F30%2FES6%25EC%2597%2590%25EC%2584%259C-Promise%25EB%25A5%25BC-%25EC%2588%259C%25EC%25B0%25A8%25EC%25A0%2581%25EC%259C%25BC%25EB%25A1%259C-%25EC%258B%25A4%25ED%2596%2589%25ED%2595%2598%25EA%25B8%25B0%2F"
+        onclick="window.open(this.href, 'facebook-share', 'width=550,height=255');return false;">
+        <i class="fa fa-facebook-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+      <a href="//plus.google.com/share?title=ES6%EC%97%90%EC%84%9C+Promise%EB%A5%BC+%EC%88%9C%EC%B0%A8%EC%A0%81%EC%9C%BC%EB%A1%9C+%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0&url=https%3A%2F%2Feunvanz.github.io%2Fjavascript%2F2018%2F01%2F30%2FES6%25EC%2597%2590%25EC%2584%259C-Promise%25EB%25A5%25BC-%25EC%2588%259C%25EC%25B0%25A8%25EC%25A0%2581%25EC%259C%25BC%25EB%25A1%259C-%25EC%258B%25A4%25ED%2596%2589%25ED%2595%2598%25EA%25B8%25B0%2F"
+        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
+        <i class="fa fa-google-plus-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'civasoul';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">방구석엔지니어</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:eunvanz@gmail.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">eunvanz@gmail.com</span>
+          </a>
+        </li>
+
+        
+          
+        
+          
+        
+          
+          <li>
+            <a href="https://github.com/eunvanz" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">eunvanz</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://stackoverflow.com/users/6475121/benjamin" title="Answer me on StackOverflow">
+              <i class="fa fa-stack-overflow"></i>
+              <span class="username">benjamin</span>
+            </a>
+          </li>
+          
+        
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+      <p class="text">밥값하는 그날까지, 삽질은 계속된다.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-108473284-1', 'auto');
+  ga('send', 'pageview', {
+    'page': '/javascript/2018/01/30/ES6%EC%97%90%EC%84%9C-Promise%EB%A5%BC-%EC%88%9C%EC%B0%A8%EC%A0%81%EC%9C%BC%EB%A1%9C-%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0/',
+    'title': 'ES6에서 Promise를 순차적으로 실행하기'
+  });
+</script>
+
+
+
+  </body>
+
+</html>
