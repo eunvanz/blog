@@ -1,0 +1,66 @@
+---
+layout: post
+title: "ES6에서 Promise를 순차적으로 실행하기"
+date: 2018-01-30 00:18:26 +0900
+author: 방구석엔지니어
+categories: javascript
+tags: javascript es6
+cover: "/assets/javascript-code.jpg"
+---
+
+Promise는 javascript의 비동기 호출 시 펼쳐지는 callback지옥을 해소할 수 있는 아주 유용한 ES6 객체이다. 현재 존재하는 Promise의 함수 중에서 여러 Promise 함수들을 한꺼번에 handling 할 수 있도록 해주는 함수로 `Promise.all()`이라는 함수가 있지만, 이 함수는 Promise 함수들을 순차적으로 실행시켜 주지는 않는다.
+
+예를 들어, 정렬되어 있는 순서대로 순차적으로 DB에 입력되어야 하는 `items`라는 Object 배열이 있다. 순차적으로 DB에 입력한다는 조건을 무시한다면 `Promise.all()`을 사용하여 아래와 같이 코드를 짤 수 있을 것이다.
+
+```js
+import axios from 'axios'
+import { API_BASE_URL } from './constant'
+
+const items = [
+  {name: 'firstItem', seq: 1},
+  {name: 'secondItem', seq: 2},
+  {name: 'thirdItem', seq: 3},
+  {name: 'fourthItem', seq: 4}
+]
+
+const postItem = item => {
+  return axios.post(`${API_BASE_URL}/item`, item)
+}
+
+const promArr = items.map(item => postItem(item))
+
+Promise.all(promArr)
+.then(result => {
+  // 성공 후 처리
+})
+```
+
+위 코드는 얼핏보면 정렬된 `items`에 대하여 순차적으로 `postItem`함수가 호출되고 db에 순차적으로 입력될 것 같지만, 각 함수들은 병렬적으로 실행되어 결국에는 뒤죽박죽으로 입력된다. 비동기이기 때문에 각 함수들이 수행되는 시간이 일정하지 않기 때문이다. 즉, 순서가 보장되지 않는다. 순서를 보장하기 위해서는 아래와 같이 코드를 고쳐야 한다.
+
+```js
+postItem(items[0])
+.then(() => postItem(items[1]))
+.then(() => postItem(items[2]))
+.then(() => postItem(items[3]))
+.then(() => {
+  // 성공 후 처리
+})
+```
+
+하지만, 이 코드는 `items`의 length가 클 경우에 사용할 수가 없다.
+
+# `reduce()`를 활용하여 순차적으로 Promise 함수 실행하기 #
+이 문제는 `Array.prototype.reduce()`함수를 활용하면 간단히 해결 가능하다. `Array.prototype.reduce()`함수의 자세한 설명은 [이곳][here]을 참고하자.
+
+```js
+items.reduce((prevProm, item) => {
+  return prevProm.then(() => postItem(item))
+}, Promise.resolve())
+.then(() => {
+  // 성공 후 처리
+})
+```
+
+이와 같은 방법으로 아주 간단하게 순차적으로 여러 Promise 함수를 처리할 수 있다.
+
+[here]: https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
