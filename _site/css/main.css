@@ -102,6 +102,9 @@ select {
   max-width: 100%;
   width: auto; }
 
+figure.highlight {
+  margin: 0; }
+
 ul.default, .page-content ul.post-list, .page-content .page ul.posts-list, .site-footer .site-navigation ul, .site-footer .site-contact ul,
 .page-content ol.post-list,
 .page-content .page ol.posts-list,
