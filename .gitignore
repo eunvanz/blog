@@ -1,11 +1,7 @@
 .DS_Store
 
 # Compiled site
-<<<<<<< HEAD
 _site/
-=======
-_site
->>>>>>> cb561a6ae65fe4e0f5838f89a11a121340d83231
 
 # Sass garbage
 .sass-cache

@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "[React] create-react-app으로 프로젝트 시작하기"
-date: 2018-06-08 12:44:06 +0900
+title:  "[React] create-react-app으로 프로젝트 시작하기"
+date:   2018-06-05 12:44:06 +0900
 author: 방구석엔지니어
 categories: react
-tags: react create-react-app
-cover: "/assets/react.jpg"
+tags:	react create-react-app
+cover:  "/assets/react.jpeg"
 ---
 
 # create-react-app 이란? #
@@ -129,7 +129,7 @@ registerServiceWorker();
 
 그렇다면 우리가 소스코드를 작성해야 하는 파일은? ```App.js```파일이 된다. 파일을 열어보자.
 
-```
+```jsx
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
@@ -157,7 +157,7 @@ export default App;
 ## state 만들기 ##
 TODO 웹을 만들기에 앞서서, react Component에서 빠질 수 없는 개념인 ```state```에 대해 알고 넘어가고자 한다. ```state```는 컴포넌트의 스코프 안의 지역변수라고 할 수 있다. 이 state가 변경되면 이 state를 참조하고 있는 컴포넌트의 다른 부분들도 영향을 받아 업데이트 된다. 우선 state를 선언부터 해보겠다.
 
-```
+```jsx
 ...
 
 class App extends Component {
@@ -177,7 +177,229 @@ class App extends Component {
 render 함수 위에 constructor를 선언하고, constructor 안에 ```this.state```를 선언했다. state는 기본적으로 Object의 형태로 선언한다. 여기에서는 todo 아이템이 들어갈 배열을 선언했다. 이 state에 ```todo``` 객체들을 넣을 생각이다.
 
 ## render 함수 구현하기 ##
-render 함수는 화면에 그려지는 엘리먼트들을 jsx 문법으로 리턴한다. 우선 할 일을 등록하는 양식이 필요할 것 같다.
+render 함수는 화면에 그려지는 엘리먼트들을 jsx 문법으로 리턴한다. 우선 할 일을 등록하는 양식이 필요할 것 같다. 간단하게 할 일을 입력할 수 있는 ```input```과 ```button```을 만들어보자. 스타일도 포기할 수 없으니 css는 [bootstrap](https://getbootstrap.com)을 사용하도록 해보자.
 
- 
+### public/index.html ###
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    ...
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    ...
+  </head>
+  ...
+</html>
 
+```
+
+```public/index.html```에 bootstrap css를 추가한다.
+
+### src/App.js ###
+```jsx
+...
+
+let todoId = 0 // todo 아이템의 id를 증가시키며 저장하는 변수
+
+class App extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      todoItems: [],
+      todoInput: '' // 새 할 일 input의 value를 저장하는 state
+    }
+    this._handleOnClickAddItem = this._handleOnClickAddItem.bind(this)
+    this._handleOnChangeTodoInput = this._handleOnChangeTodoInput.bind(this)
+  }
+
+  _handleOnClickAddItem () {
+    const { todoInput, todoItems } = this.state
+    if (todoInput.length === 0) return alert('내용을 입력해주세요.')
+    const todoItem = {
+      id: todoId++,
+      title: todoInput,
+      isCompleted: false
+    }
+    const newTodoItems = todoItems.slice(0)
+    newTodoItems.push(todoItem)
+    this.setState({ todoItems: newTodoItems, todoInput: '' })
+  }
+
+  _handleOnChangeTodoInput (e) {
+    this.setState({ todoInput: e.target.value })
+  }
+
+  render () {
+    return (
+      <div className='container' style={% raw %}{{ maxWidth: 600, padding: '20px 0' }}{% endraw %}>
+        <div className='row'>
+          <div className='col text-center'>
+            <div className='input-group'>
+              <input
+                type='text'
+                className='form-control'
+                placeholder='새로운 할 일을 입력해주세요.'
+                value={this.state.todoInput}
+                onChange={this._handleOnChangeTodoInput}
+                onKeyDown={e => e.keyCode === 13 ? this._handleOnClickAddItem() : null}
+              />
+              <div className='input-group-append'>
+                <button
+                  className='btn btn-outline-secondary'
+                  onClick={this._handleOnClickAddItem}
+                >
+                  등록
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+export default App;
+```
+새 할일을 등록할 폼을 작성해보았다. 이 코드만으로도 리액트의 여러가지 문법들과 보편적인 구조를 확인해볼 수 있다.
+
+- 스타일링 : jsx 문법에서의 클래스 명은 ```className```이라는 속성을 사용한다. es6의 ```class```지정자와 겹치기 때문이다. 따라서 기존 레가시 html을 복사 붙여넣기 할 경우 class 속성이 그대로 남아있으면 스타일이 먹지 않으므로 주의해야 한다. 인라인 스타일의 경우에는 javascript object 형태로 입력해야 한다. jsx 문법에서 javascript를 삽입하기 위해서는 중괄호 ```{}```를 사용하는데, ```style```속성 내에 javascript object를 넣다 보니 ```style={% raw %}{{ maxWidth: 600, padding: '20px 0' }}{% endraw %}```과 같은 형태가 된다. css 문법의 케밥케이스를 카멜케이스로 옮기는 방식으로 키를 지정하고, 값은 css 문법 그대로 string 타입으로 넣거나, number타입으로 넣어도 된다. number타입일 경우에 단위는 픽셀로 인식이 된다.
+
+- 폼 엘리먼트 : 리액트 컴포넌트는 기본적으로 state와 props의 변화에 따라 새롭게 화면을 랜더링을 한다. (메모리에서 DOM을 비교하여 변경이 되는DOM만 새로 렌더링) ```input```은 사용자의 키보드 입력이 들어올 때 마다 화면을 새로 렌더링해줘야 하는데, 이를 위해 컴포넌트의 state를 이용한다. 위 예제에서는 ```todoInput```이라는 state를 만들어주었고, 초기값을 ```''```로 설정했다. 그리고 ```input```태그의 ```value```속성에 ```todoInput```을 할당해주었다. 또한 ```input```태그의 ```onChange```이벤트에 ```this._handleOnChangeTodoInput```메소드를 할당하여 키보드 입력 시에 ```todoInput``` state를 변경하도록 했다. 리액트에서 하나의 ```input```태그가 작동하려면 이러한 일련의 과정을 거쳐야한다. (조금 복잡하다고 생각할 수도 있지만 간편하게 사용할 수 있는 폼 컨트롤과 관련된 라이브러리들을 사용하면 되므로 너무 걱정하지 말자. 원리를 이해하기 위한 과정일 뿐이다.)
+
+- 이벤트바인딩 : ```input```에서 ```onChange```속성을 이용하여 DOM과 이벤트를 바인딩한 것 처럼, jsx 태그에 ```on****```와 같은 속성을 넣어주는 것으로 이벤트와 함수를 바인딩시킬 수 있다. ```등록```버튼에 ```onClick```속성을 넣어주어 버튼 클릭 시에 새로운 할 일을 등록하는 함수를 실행한다. 그리고 ```input```태그에 ```onKeyDown```속성을 넣어주어 키보드 입력이 엔터키일경우 같은 기능을 수행하도록 했다. class의 멤버 함수를 선언할 때 함수 안에서 ```this```를 사용하는 경우 ```constructor```에 ```this._handleOnClickAddItem = this._handleOnClickAddItem.bind(this)```와 같이 함수에 인스턴스를 바인딩 해주는 것을 잊지말자. (해줘야 하는 경우와 안해도 되는 경우가 있는데, 자세한 설명은 [이곳](https://medium.freecodecamp.org/react-binding-patterns-5-approaches-for-handling-this-92c651b5af56)을 참고하자.)
+
+```jsx
+{% raw %}
+import React, { Component } from 'react';
+
+let todoId = 0 // todo 아이템의 id를 증가시키며 저장하는 변수
+
+class App extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      todoItems: [],
+      todoInput: ''
+    }
+    this._handleOnClickAddItem = this._handleOnClickAddItem.bind(this)
+    this._handleOnChangeTodoInput = this._handleOnChangeTodoInput.bind(this)
+    this._handleOnClickToggleState = this._handleOnClickToggleState.bind(this)
+    this._handleOnClickRemove = this._handleOnClickRemove.bind(this)
+  }
+
+  _handleOnClickAddItem () {
+    const { todoInput, todoItems } = this.state
+    if (todoInput.length === 0) return alert('내용을 입력해주세요.')
+    const todoItem = {
+      id: todoId++,
+      title: todoInput,
+      isCompleted: false
+    }
+    const newTodoItems = todoItems.slice(0)
+    newTodoItems.push(todoItem)
+    this.setState({ todoItems: newTodoItems, todoInput: '' })
+  }
+
+  _handleOnChangeTodoInput (e) {
+    this.setState({ todoInput: e.target.value })
+  }
+
+  _handleOnClickToggleState (index) { // index에 해당하는 아이템의 isCompleted 를 토글한다.
+    const { todoItems } = this.state
+    const newTodoItems = todoItems.slice(0)
+    newTodoItems[index].isCompleted = !todoItems[index].isCompleted
+    this.setState({ todoItems: newTodoItems })
+  }
+
+  _handleOnClickRemove (id) {
+    const { todoItems } = this.state
+    const newTodoItems = todoItems.filter(item => item.id !== id)
+    this.setState({ todoItems: newTodoItems })
+  }
+
+  render () {
+    const renderCancelButton = item => (
+      <button
+        className='btn btn-danger btn-sm'
+        style={{ marginLeft: 5 }}
+        onClick={() => this._handleOnClickRemove(item.id)}
+      >
+        삭제
+      </button>
+    )
+    return (
+      <div className='container' style={{ maxWidth: 600, padding: '20px 0' }}>
+        <div className='row'>
+          <div className='col text-center'>
+            <div className='input-group'>
+              <input
+                type='text'
+                className='form-control'
+                placeholder='새로운 할 일을 입력해주세요.'
+                value={this.state.todoInput}
+                onChange={this._handleOnChangeTodoInput}
+                onKeyDown={e => e.keyCode === 13 ? this._handleOnClickAddItem() : null}
+              />
+              <div className='input-group-append'>
+                <button
+                  className='btn btn-outline-secondary'
+                  onClick={this._handleOnClickAddItem}
+                >
+                  등록
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className='row' style={ { marginTop: 20 } }>
+          <div className='col-6'>
+            <h3>해야할 일</h3>
+            {
+              this.state.todoItems.filter(item => !item.isCompleted).map(item =>
+                <div key={item.id} style={{ margin: 10 }}>
+                  <span style={{ marginRight: 5 }}>- {item.title}</span>
+                  <button
+                    className='btn btn-success btn-sm'
+                    onClick={() => this._handleOnClickToggleState(item.id)}
+                  >
+                    완료
+                  </button>
+                  {renderCancelButton(item)}
+                </div>
+              )
+            }
+          </div>
+          <div className='col-6'>
+            <h3>완료한 일</h3>
+            {
+              this.state.todoItems.filter(item => item.isCompleted).map(item =>
+                <div key={item.id} style={{ margin: 10 }}>
+                  <span style={{ marginRight: 5 }}>- {item.title}</span>
+                  <button
+                    className='btn btn-warning btn-sm'
+                    onClick={() => this._handleOnClickToggleState(item.id)}
+                  >
+                    취소
+                  </button>
+                  {renderCancelButton(item)}
+                </div>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App;
+{% endraw %}
+```
+
+등록된 최종적인 소스이다. ```render```메소드 안에서 중복되는 엘리먼트들은 ```renderCancelButton```함수처럼 함수로 지정하여 사용할 수도 있다. 하지만 이 방법은 ```render```함수가 호출될 때 마다(화면을 다시 렌더링 할 때 마다) 쓸 데 없이 함수를 다시 선언하는 과정을 거치니 앞으로는 멤버함수(```this._renderCancelButton```와 같은 방식)로 선언해주도록 하자. 아래와 같이 잘 작동되면 성공!!
+
+![실행화면](/assets/posts/create-react-app_TODO_1.gif)
+
+다음 포스팅에서는 내부 엘리먼트들을 리액트 컴포넌트로 분리해보도록 하겠다.
+전체 소스는 [이곳](https://github.com/eunvanz/create-react-app-todo-1)에 공유되어있다.
