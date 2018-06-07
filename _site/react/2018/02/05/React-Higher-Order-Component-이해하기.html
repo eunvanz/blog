@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>[React] Higher Order Component 이해하기</title>
+  <meta name="description" content="Higher Order Component 개요Higher Order Component (이하 HOC)는 리액트에서 사용되는 일종의 디자인 패턴이다. HOC는 리액트 컴포넌트를 인자로 받아 리액트 컴포넌트를 반환한다. 기본적으로 아래와 같은 형태이다.export default Com...">
+  
+  <meta name="author" content="CIVASOUL">
+  <meta name="copyright" content="&copy; CIVASOUL 2018">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="https://eunvanz.github.io/react/2018/02/05/React-Higher-Order-Component-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0.html">
+  <link rel="alternate" type="application/rss+xml" title="방구석엔지니어" href="https://eunvanz.github.io/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/" class="logo">
+      
+      <img src="/assets/logo.png" alt="방구석엔지니어">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container has-cover" style="background-image: url(/assets/react.jpeg);">
+  <div class="scrim has-cover">
+    <header class="post-header">
+      <h1 class="title">[React] Higher Order Component 이해하기</h1>
+      <p class="info">by <strong>방구석엔지니어</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+
+
+<section class="post-meta">
+  <div class="post-date">February 5, 2018</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/category/react">React</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <h1 id="higher-order-component-">Higher Order Component 개요</h1>
+<p>Higher Order Component (이하 HOC)는 리액트에서 사용되는 일종의 디자인 패턴이다. HOC는 리액트 컴포넌트를 인자로 받아 리액트 컴포넌트를 반환한다. 기본적으로 아래와 같은 형태이다.</p>
+<pre><code class="language-jsx">export default ComposedComponent =&gt; {
+  class HOC extends React.Component {
+    const { ...props } = this.props
+    render () {
+      return &lt;ComposedComponent {...props} /&gt;
+    }
+  }
+  return HOC
+}
+</code></pre>
+<p>위 코드를 템플릿으로 하여 갖가지 양념을 쳐서 특정한 기능을 수행하는 컴포넌트를 생산할 수 있다. 주로, 여러 컴포넌트에 반복적으로 들어가는 코드들을 HOC에 작성하면 된다. 즉, 여러 컴포넌트들이 가지고 있는 횡단관심사(Cross-cutting concerns)들을 구현하는 컴포넌트가 HOC이다.</p>
+
+<p>스프링 AOP를 공부하면서 들었던 개념이 횡단관심사라는 개념인데, View에서의 횡단관심사는 감이 잘 잡히지 않는다. View에서의 횡단관심사들은 어떤것들이 있을까? 생각해보면 생각보다 많다. 그리고 실제로 작업을 하다보면 이러한 횡단관심사들이 View에서도 상당히 많다. 일단 생각나는 것을 떠올려보면,</p>
+
+<ul>
+  <li><strong>유저 인증 로직:</strong> 사용자가 로그인 상태인지, 권한이 있는 사용자인지에 따라 페이지를 보여주거나, 로그인 페이지로 이동시키거나, 권한이 없다는 안내 메시지를 띄우는 등, 사용자 상태에 따라 분기를 시키는 유저 인증 작업을 HOC에게 위임할 수 있다.</li>
+  <li><strong>Dumb와 Smart 컴포넌트 분리:</strong> Redux 패턴에서 권장하는 방식인 Dumb 컴포넌트(Presentational Component)와 Smart 컴포넌트(Container Component)를 분리하는데에 사용되고 있다. <code class="highlighter-rouge">react-redux</code>모듈에서는 <code class="highlighter-rouge">connect</code>라는 HOC를 제공하고 있으며, 이는 Dumb 컴포넌트와 Smart 컴포넌트를 분리할 수 있게 해준다. 이로 인해 컴포넌트의 재사용성과 유지보수 용이성을 높일 수 있다.</li>
+  <li><strong>로딩 화면 표시:</strong> 화면을 띄우기위한 데이터가 로딩 중일 때 로딩 화면을 표시하고, 데이터 로딩이 완료됐을 때 인자로 받은 컴포넌트를 보여주도록 하는 로직을 HOC가 담당하게 할 수 있다.</li>
+</ul>
+
+<p>이러한 것들을 쉽게 떠올릴 수 있다. 좀 더 복잡하게 사용하면 폼 데이터와 state의 바인딩 등과 같이 더욱 다양한 상황에서 사용할 수 있다.</p>
+
+<h1 id="higher-order-component--1">Higher Order Component 구현</h1>
+<p>간단하게 HOC를 구현해 보는 예제이다. 사용자 로그인 상태일경우 페이지를 정상적으로 보여주고, 로그인이 돼있지 않을 경우 로그인 페이지로 이동하는 로직을 갖고 있는 HOC를 구현해보겠다.</p>
+
+<p>그 전에 몇 가지 가정이 필요하다. 아래는 현재 내가 실제로 진행하고 있는 프로젝트의 환경과 같다.</p>
+
+<ul>
+  <li>사용자가 로그인 상태일 경우에는 redux store의 state에 user라는 키값으로 user 객체가 존재</li>
+  <li><strong>needAuth.js:</strong> 로그인 여부에 따라 페이지 이동 처리를 하는 HOC로, 로그인 상태가 아닐 시 <code class="highlighter-rouge">/sign-in</code> route로 이동</li>
+  <li><strong>UserProfileContainer.js:</strong> redux store와 뷰를 연결짓는 container 컴포넌트</li>
+  <li><strong>UserProfileView.js:</strong> 사용자 자신의 프로필을 조회하는 presentational 컴포넌트</li>
+</ul>
+
+<p><strong>needAuth.js:</strong></p>
+<pre><code class="language-jsx">import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+
+export default ComposedComponent =&gt; {
+  class needAuth extends React.Component {
+    componentDidMount () {
+      const { user } = this.props
+      if (!user) this.context.router.push('/sign-in')
+    }
+    render () {
+      const { user, ...props } = this.props
+      if (!user) return &lt;div&gt;로그인 처리 중...&lt;/div&gt;
+      return &lt;ComposedComponent user={user} {...props} /&gt;
+    }
+  }
+  needAuth.contextTypes = {
+    router: PropTypes.object.isRequired
+  }
+  needAuth.propTypes = {
+    user: PropTypes.object
+  }
+  const mapStateToProps = state =&gt; {
+    return {
+      user: state.user
+    }
+  }
+  return connect(mapStateToProps, null)(needAuth)
+}
+</code></pre>
+
+<p><strong>UserProfileContainer.js:</strong></p>
+<pre><code class="language-jsx">import UserProfileView from '../components/UserProfileView'
+import needAuth from 'hocs/needAuth'
+
+export default needAuth(UserProfileView)
+</code></pre>
+
+<p><strong>UserProfileView.js:</strong></p>
+<pre><code class="language-jsx">import React from 'react'
+import PropTypes from 'prop-types'
+
+class UserProfileView extends React.Component {
+  render () {
+    const { user } = this.props
+    return (
+      &lt;div&gt;
+        &lt;p&gt;name: {user.name}&lt;/p&gt;
+        &lt;p&gt;mobile: {user.mobile}&lt;/p&gt;
+        &lt;p&gt;hobby: {user.hobby}&lt;/p&gt;
+      &lt;div&gt;
+    )
+  }
+}
+UserProfileView.propTypes = {
+  user: PropTypes.object.isRequired
+}
+export default UserProfileView
+</code></pre>
+
+<p>위와 같이 간단하게 HOC를 만들고 적용해보았다. 실제 프로젝트에 적용한 결과 아주 잘 작동한다.</p>
+
+</article>
+
+
+
+<section class="tags">
+  <strong>Tags:</strong> <a href="/tag/react">react</a>,&nbsp;<a href="/tag/hoc">hoc</a>
+</section>
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'civasoul';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">방구석엔지니어</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:eunvanz@gmail.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">eunvanz@gmail.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/eunvanz" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">eunvanz</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://stackoverflow.com/users/6475121/benjamin" title="Answer me on StackOverflow">
+              <i class="fa fa-stack-overflow"></i>
+              <span class="username">benjamin</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+      <p class="text">밥값하는 그날까지, 삽질은 계속된다.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-108473284-1', 'auto');
+  ga('send', 'pageview', {
+    'page': '/react/2018/02/05/React-Higher-Order-Component-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0.html',
+    'title': '[React] Higher Order Component 이해하기'
+  });
+</script>
+
+
+
+  </body>
+
+</html>

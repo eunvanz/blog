@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "create-react-app으로 프로젝트 시작하기"
-date:   2018-06-08 12:44:06 +0900
+title: "[React] create-react-app으로 프로젝트 시작하기"
+date: 2018-06-08 12:44:06 +0900
 author: 방구석엔지니어
-categories: javascript
-tags:	react
-cover:  "/assets/instacode.png"
+categories: react
+tags: react create-react-app
+cover: "/assets/react.jpg"
 ---
 
-# create-react-app 이란?
+# create-react-app 이란? #
 create-react-app은 페이스북에서 만든 react 웹 개발용 boilerplate이다. create-react-app이 나오기 전 까지는
 1. 직접 모든 환경을 설정하거나, 
 2. 남이 만든 boilerplate를 사용
@@ -17,7 +17,7 @@ create-react-app은 페이스북에서 만든 react 웹 개발용 boilerplate이
 
 create-react-app은 페이스북에서 만들고 지속적으로 업데이트 되는 공식적인 boilerplate이기 때문에 위와 같은 걱정이 없어졌다. 이 포스팅에서는 create-react-app을 통해서 간단한 TODO 웹을 만들어 보도록 하겠다.
 
-# create-react-app 설치
+# create-react-app 설치 #
 우선 npm 최신버전이 설치되어있어야 한다. 프로젝트 폴더를 생성하고자 하는 폴더로 가서 아래와 같이 명령어를 입력하자. npx는 npm 패키지를 로컬에 글로벌로 설치하지 않고 바로 일회성으로 실행할 수 있게 해주는 도구이다. npm 5.2.0 버전 이후부터 기본으로 제공된다.
 
 ```
@@ -40,7 +40,7 @@ npm start
 
 실행을 하면 브라우저가 실행되면서 ```localhost:3000```포트에 프로젝트가 떠 있는 것을 확인해볼 수 있다. (3000번 포트를 이미 사용 중이라면 3001, 3002, ...와 같이 증가된 포트에 뜬다.)
 
-# create-react-app 프로젝트의 구조
+# create-react-app 프로젝트의 구조 #
 폴더는 아래와 같이 구성되어있다.
 ```
 react-todo/
@@ -81,8 +81,8 @@ src 폴더에 우리가 직접 작성할 소스코드 파일이 들어가고, pu
 ```
 ```package.json```파일을 얼여보면 이상하리 만큼 단순한 것을 확인할 수 있다. dependency가 3개 밖에 없고, devDependency도 없다. 하지만 ```node_modules/```폴더를 보면 알 수 있듯이, 내부적으로는 무수히 많은 dependency가 존재한다. 이는 ```create-react-app```의 특징인데, 모든 설정들이 캡슐화 되어있다. 사용자로 하여금 설정들을 건들지 못하도록 실제 ```package.json```을 숨겨두고, ```webpack```설정과 관련된 부분들도 모두 숨겨두었다. 한마디로 개발자들이 소스코드에만 집중할 수 있도록 배려해 놓았다. ```scripts```설정에 보면 사용할 수 있는 명령어 중에 ```eject```라는 명령어를 통해 이러한 봉인을 해제할 수 있으나, 이 포스팅에서는 ```create-react-app```의 의도대로 소스코드에만 집중해보도록 하겠다.
 
-# 소스코드 작성하기
-## 기존 소스코드 분석
+# 소스코드 작성하기 #
+## 기존 소스코드 분석 ##
 엔트리 포인트인 ```src/index.js```파일을 열어보자.
 ```
 import React from 'react';
@@ -154,7 +154,7 @@ export default App;
 ```
 모든 react 컴포넌트들은 react 모듈의 ```Component```클래스를 상속받는다. ```Component```는 ui를 구성하는 엘리먼트들을 독립적이고 재사용 가능하게 만드는 추상 클래스라고 생각하면 된다. 미리 정의해 둔 메소드들이 있고, 그 메소드들을 override 해서 컴포넌트들을 구현하는데, 그 중에서 화면을 그려주는 ```render``` 메소드는 필수적으로 정의해야 한다. ```render``` 메소드는 반드시 jsx 문법으로 작성한 하나의 엘리먼트를 리턴한다.
 
-## state 만들기
+## state 만들기 ##
 TODO 웹을 만들기에 앞서서, react Component에서 빠질 수 없는 개념인 ```state```에 대해 알고 넘어가고자 한다. ```state```는 컴포넌트의 스코프 안의 지역변수라고 할 수 있다. 이 state가 변경되면 이 state를 참조하고 있는 컴포넌트의 다른 부분들도 영향을 받아 업데이트 된다. 우선 state를 선언부터 해보겠다.
 
 ```
@@ -176,7 +176,8 @@ class App extends Component {
 ```
 render 함수 위에 constructor를 선언하고, constructor 안에 ```this.state```를 선언했다. state는 기본적으로 Object의 형태로 선언한다. 여기에서는 todo 아이템이 들어갈 배열을 선언했다. 이 state에 ```todo``` 객체들을 넣을 생각이다.
 
-## render 함수 구현하기
+## render 함수 구현하기 ##
 render 함수는 화면에 그려지는 엘리먼트들을 jsx 문법으로 리턴한다. 우선 할 일을 등록하는 양식이 필요할 것 같다.
 
  
+

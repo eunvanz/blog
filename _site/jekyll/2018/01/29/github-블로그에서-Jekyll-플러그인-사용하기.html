@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>GitHub 블로그에서 Jekyll 플러그인 사용하기</title>
+  <meta name="description" content="GitHub Pages 내부적으로 Jekyll을 사용하고 있고, 정적 페이지 생성에 있어서 Jekyll의 간편함때문에 많은 개발자들이 자신의 기술블로그로 GitHub Pages를 사용하고 있다. 하지만 GitHub에서는 보안상의 이유로 GitHub에서 기본으로 제공하고 있는 플러그...">
+  
+  <meta name="author" content="CIVASOUL">
+  <meta name="copyright" content="&copy; CIVASOUL 2018">
+  
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="https://eunvanz.github.io/jekyll/2018/01/29/github-%EB%B8%94%EB%A1%9C%EA%B7%B8%EC%97%90%EC%84%9C-Jekyll-%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0.html">
+  <link rel="alternate" type="application/rss+xml" title="방구석엔지니어" href="https://eunvanz.github.io/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/" class="logo">
+      
+      <img src="/assets/logo.png" alt="방구석엔지니어">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container has-cover" style="background-image: url(/assets/blog.jpg);">
+  <div class="scrim has-cover">
+    <header class="post-header">
+      <h1 class="title">GitHub 블로그에서 Jekyll 플러그인 사용하기</h1>
+      <p class="info">by <strong>방구석엔지니어</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+
+
+<section class="post-meta">
+  <div class="post-date">January 29, 2018</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/category/jekyll">Jekyll</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <p>GitHub Pages 내부적으로 Jekyll을 사용하고 있고, 정적 페이지 생성에 있어서 Jekyll의 간편함때문에 많은 개발자들이 자신의 기술블로그로 GitHub Pages를 사용하고 있다. 하지만 GitHub에서는 보안상의 이유로 GitHub에서 기본으로 제공하고 있는 플러그인 이외의 사용자 플러그인을 지원하지 않고 있다. 그래도 외부 플러그인을 사용하는 방법이 다 있다. 그런데 ruby를 잘 모른다면 적용에 있어서 애를 먹을지도 모른다. 이 블로그에서도 <a href="https://github.com/jekyll/jekyll-archives">jekyll-archives</a> 라는 플러그인을 적용시키는데에 애를 먹었기 때문에, 한 번 정리해 두려고 한다.</p>
+
+<h1 id="section">기본세팅</h1>
+<p><a href="http://jekyllthemes.org">jekyllthemes.org</a>를 통해 원하는 테마를 선택하고, Fork까지 하는 과정은 생략하려 한다. 이와 관련된 내용은 다른 블로그를 참고해도 되고, 아주 간단하다. 내 GitHub 계정에 Fork하고, Setting에서 repository 이름을 <code class="highlighter-rouge">&lt;내계정&gt;.github.io </code>로 설정하면 자동으로 <code class="highlighter-rouge">https://&lt;내계정&gt;.github.io</code>로 호스팅 된다. 하지만 만약 Fork한 테마에 외부 플러그인이 적용된 부분이 있다면, 그 부분은 작동하지 않는다.</p>
+
+<p>기본적인 Jekyll에 대한 지식이 부족한 상태에서는 <a href="http://jekyllrb-ko.github.io/docs/home/">Jekyll 공식 페이지</a>를 참고하자.</p>
+
+<h1 id="section-1">외부플러그인 적용하기</h1>
+<p>외부 플러그인을 적용하기 위해서는 로컬에서 페이지들을 build하고, build된 페이지가 생성된 폴더를 root로하여 repository의 <code class="highlighter-rouge">master</code> 브랜치에 업로드 해야 한다. 아래와 같은 절차를 따르자.</p>
+
+<h2 id="repository-source--">Repository에 source 브랜치 생성</h2>
+<p>Repo에 <code class="highlighter-rouge">source</code>라는 브랜치를 생성하자. <code class="highlighter-rouge">master</code> 브랜치에는 빌드 된 리소스들이 들어가야 하기 때문에, 현재 <code class="highlighter-rouge">master</code>에 존재하는 소스들이 복사될 브랜치이다.</p>
+
+<pre>
+$ git checkout -b source master
+$ git push -u origin source
+</pre>
+
+<p>그리고나서 GitHub Setting 페이지에서 <code class="highlighter-rouge">source</code>브랜치를 default 브랜치로 바꿔주자. <code class="highlighter-rouge">Settings &gt; Branches &gt; Default branch</code>에 있다.</p>
+
+<h2 id="publishig--">Publishig 자동화 하기</h2>
+<p>수동으로 빌드 된 페이지를 GitHub에 publishing하는 방법은 <a href="http://gumpcha.github.io/blog/github-pages-with-jekyll-custom-plugin/">여기</a>에 잘 설명 되어있다. 허나 너무 번거롭다. 자동화 하자.</p>
+
+<p>로컬 Repo 루트에 <code class="highlighter-rouge">rakefile</code> 이라는 파일을 하나 생성한다. 그리고 파일 내용은 아래와 같이 구성한다.</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s2">"rubygems"</span>
+<span class="nb">require</span> <span class="s2">"tmpdir"</span>
+
+<span class="nb">require</span> <span class="s2">"bundler/setup"</span>
+<span class="nb">require</span> <span class="s2">"jekyll"</span>
+
+
+<span class="c1"># Change your GitHub reponame</span>
+<span class="no">GITHUB_REPONAME</span> <span class="o">=</span> <span class="s2">"eunvanz/eunvanz.github.io"</span>
+
+
+<span class="n">desc</span> <span class="s2">"Generate blog files"</span>
+<span class="n">task</span> <span class="ss">:generate</span> <span class="k">do</span>
+  <span class="no">Jekyll</span><span class="o">::</span><span class="no">Site</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="no">Jekyll</span><span class="p">.</span><span class="nf">configuration</span><span class="p">({</span>
+    <span class="s2">"source"</span>      <span class="o">=&gt;</span> <span class="s2">"."</span><span class="p">,</span>
+    <span class="s2">"destination"</span> <span class="o">=&gt;</span> <span class="s2">"_site"</span>
+  <span class="p">})).</span><span class="nf">process</span>
+<span class="k">end</span>
+
+
+<span class="n">desc</span> <span class="s2">"Generate and publish blog to gh-pages"</span>
+<span class="n">task</span> <span class="ss">:publish</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:generate</span><span class="p">]</span> <span class="k">do</span>
+  <span class="no">Dir</span><span class="p">.</span><span class="nf">mktmpdir</span> <span class="k">do</span> <span class="o">|</span><span class="n">tmp</span><span class="o">|</span>
+    <span class="n">cp_r</span> <span class="s2">"_site/."</span><span class="p">,</span> <span class="n">tmp</span>
+
+    <span class="n">pwd</span> <span class="o">=</span> <span class="no">Dir</span><span class="p">.</span><span class="nf">pwd</span>
+    <span class="no">Dir</span><span class="p">.</span><span class="nf">chdir</span> <span class="n">tmp</span>
+
+    <span class="nb">system</span> <span class="s2">"git init"</span>
+    <span class="nb">system</span> <span class="s2">"git add ."</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">"Site updated at </span><span class="si">#{</span><span class="no">Time</span><span class="p">.</span><span class="nf">now</span><span class="p">.</span><span class="nf">utc</span><span class="si">}</span><span class="s2">"</span>
+    <span class="nb">system</span> <span class="s2">"git commit -m </span><span class="si">#{</span><span class="n">message</span><span class="p">.</span><span class="nf">inspect</span><span class="si">}</span><span class="s2">"</span>
+    <span class="nb">system</span> <span class="s2">"git remote add origin https://github.com/</span><span class="si">#{</span><span class="no">GITHUB_REPONAME</span><span class="si">}</span><span class="s2">.git"</span>
+    <span class="nb">system</span> <span class="s2">"git push origin master --force"</span>
+
+    <span class="no">Dir</span><span class="p">.</span><span class="nf">chdir</span> <span class="n">pwd</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>그리고 로컬 Repo Root 커맨드라인에서 <code class="highlighter-rouge">jekyll serve</code>로 로컬의<code class="highlighter-rouge">_site</code> 폴더에 빌드를 하고, <code class="highlighter-rouge">rake publish</code>를 입력하기만 하면 자동으로 GitHub Pages에 배포된다.</p>
+
+<p>여러 방법을 찾아봤으나 이 방법이 가장 간단한 방법이다. 이후에는 로컬에서 소스를 관리하고, 빌드된 리소스만 커맨드입력을 통해 배포하면 된다. Ruby를 사용할 줄 몰라도 비교적 쉽게 따라할 수 있으니 헤매고 계신다면 이렇게 해보세요. 설명이 부족한 부분이 있다면 지적바랍니다.</p>
+
+
+</article>
+
+
+
+<section class="tags">
+  <strong>Tags:</strong> <a href="/tag/jekyll">jekyll</a>,&nbsp;<a href="/tag/github">github</a>,&nbsp;<a href="/tag/블로그">블로그</a>
+</section>
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'civasoul';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">방구석엔지니어</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:eunvanz@gmail.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">eunvanz@gmail.com</span>
+          </a>
+        </li>
+
+        
+          
+          <li>
+            <a href="https://github.com/eunvanz" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">eunvanz</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://stackoverflow.com/users/6475121/benjamin" title="Answer me on StackOverflow">
+              <i class="fa fa-stack-overflow"></i>
+              <span class="username">benjamin</span>
+            </a>
+          </li>
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+      <p class="text">밥값하는 그날까지, 삽질은 계속된다.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-108473284-1', 'auto');
+  ga('send', 'pageview', {
+    'page': '/jekyll/2018/01/29/github-%EB%B8%94%EB%A1%9C%EA%B7%B8%EC%97%90%EC%84%9C-Jekyll-%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0.html',
+    'title': 'GitHub 블로그에서 Jekyll 플러그인 사용하기'
+  });
+</script>
+
+
+
+  </body>
+
+</html>
