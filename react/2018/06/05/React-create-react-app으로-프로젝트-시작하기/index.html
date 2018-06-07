@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>[React] create-react-app으로 프로젝트 시작하기</title>
+  <meta name="description" content="create-react-app 이란?create-react-app은 페이스북에서 만든 react 웹 개발용 boilerplate이다. create-react-app이 나오기 전 까지는  직접 모든 환경을 설정하거나,  남이 만든 boilerplate를 사용">
+  
+  <meta name="author" content="CIVASOUL">
+  <meta name="copyright" content="&copy; CIVASOUL 2018">
+  
+  <meta name="naver-site-verification" content="245b5c2c0ed77124722421201ab3f63eb6d7b143" />
+
+  <!-- External libraries -->
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/css/lightbox.css">
+
+  <!-- Favicon and other icons (made with http://www.favicon-generator.org/) -->
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/assets/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/assets/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/assets/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+  <link rel="manifest" href="/assets/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/assets/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  
+
+  
+
+  
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="https://eunvanz.github.io/react/2018/06/05/React-create-react-app%EC%9C%BC%EB%A1%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0/">
+  <link rel="alternate" type="application/rss+xml" title="방구석엔지니어" href="https://eunvanz.github.io/feed.xml" />
+</head>
+
+
+  <body>
+
+    <header class="navigation" role="banner">
+  <div class="navigation-wrapper">
+    <a href="/" class="logo">
+      
+      <img src="/assets/logo.png" alt="방구석엔지니어">
+      
+    </a>
+    <a href="javascript:void(0)" class="navigation-menu-button" id="js-mobile-menu">
+      <i class="fa fa-bars"></i>
+    </a>
+    <nav role="navigation">
+      <ul id="js-navigation-menu" class="navigation-menu show">
+        
+          
+          <li class="nav-link"><a href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+          
+        
+          
+        
+      </ul>
+    </nav>
+  </div>
+</header>
+
+
+    <div class="page-content">
+        <div class="post">
+
+<div class="post-header-container has-cover" style="background-image: url(/assets/react.jpeg);">
+  <div class="scrim has-cover">
+    <header class="post-header">
+      <h1 class="title">[React] create-react-app으로 프로젝트 시작하기</h1>
+      <p class="info">by <strong>방구석엔지니어</strong></p>
+    </header>
+  </div>
+</div>
+
+<div class="wrapper">
+
+
+
+<section class="post-meta">
+  <div class="post-date">June 5, 2018</div>
+  <div class="post-categories">
+  in 
+    
+    <a href="/category/react">React</a>
+    
+  
+  </div>
+</section>
+
+<article class="post-content">
+  <h1 id="create-react-app-">create-react-app 이란?</h1>
+<p>create-react-app은 페이스북에서 만든 react 웹 개발용 boilerplate이다. create-react-app이 나오기 전 까지는</p>
+<ol>
+  <li>직접 모든 환경을 설정하거나,</li>
+  <li>남이 만든 boilerplate를 사용</li>
+</ol>
+
+<p>했어야 했다. react는 es6 버전의 javascript로 작성하는 것이 일반화 되어있기 때문에 <a href="https://webpack.js.org">webpack</a>이라는 모듈번들러로 컴파일 및 빌드 하는 것이 필수라 이 환경을 세팅해줘야한다. 즉, webpack도 공부해야 한다는 의미인데, 이게 쉽지가 않다. (react 공부하기에도 바쁘다.) 그래서 2번 방법을 주로 사용하곤 했는데, 개인이 만든 bolierplate이기 때문에 지속적 업데이트가 되지 않아 react 버전이 상승하면 익숙했던 bolierplate는 쓰지 못하게 되고, 새로운 bolierplate를 찾아야만 했다.</p>
+
+<p>create-react-app은 페이스북에서 만들고 지속적으로 업데이트 되는 공식적인 boilerplate이기 때문에 위와 같은 걱정이 없어졌다. 이 포스팅에서는 create-react-app을 통해서 간단한 TODO 웹을 만들어 보도록 하겠다.</p>
+
+<h1 id="create-react-app--1">create-react-app 설치</h1>
+<p>우선 npm 최신버전이 설치되어있어야 한다. 프로젝트 폴더를 생성하고자 하는 폴더로 가서 아래와 같이 명령어를 입력하자. npx는 npm 패키지를 로컬에 글로벌로 설치하지 않고 바로 일회성으로 실행할 수 있게 해주는 도구이다. npm 5.2.0 버전 이후부터 기본으로 제공된다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>npx create-react-app react-todo
+</code></pre>
+</div>
+
+<p>npx가 실행이 안되는 구버전이라면 아래와 같이 해야한다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>npm install -g create-react-app
+create-react-app react-todo
+</code></pre>
+</div>
+
+<p>설치가 완료되면 하위에 <code class="highlighter-rouge">react-todo</code> 라는 폴더가 생성되어 있다. 폴더 이동 후 프로젝트를 로컬에서 실행해볼 수 있다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>cd react-todo
+npm start
+</code></pre>
+</div>
+
+<p>실행을 하면 브라우저가 실행되면서 <code class="highlighter-rouge">localhost:3000</code>포트에 프로젝트가 떠 있는 것을 확인해볼 수 있다. (3000번 포트를 이미 사용 중이라면 3001, 3002, …와 같이 증가된 포트에 뜬다.)</p>
+
+<h1 id="create-react-app--">create-react-app 프로젝트의 구조</h1>
+<p>폴더는 아래와 같이 구성되어있다.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>react-todo/
+  README.md
+  node_modules/
+  package.json
+  public/
+    index.html
+    favicon.ico
+  src/
+    App.css
+    App.js
+    App.test.js
+    index.css
+    index.js
+    logo.svg
+</code></pre>
+</div>
+<p>src 폴더에 우리가 직접 작성할 소스코드 파일이 들어가고, public 폴더에 static 자원이 위치한다. <code class="highlighter-rouge">public/index.html</code>과 <code class="highlighter-rouge">src/index.js</code>는 엔트리 포인트가 되는 소스로, 파일이름이 변경되면 create-react-app은 작동하지 않으므로 주의한다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"react-todo"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.1.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"private"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"react"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^16.4.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"react-dom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^16.4.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"react-scripts"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.1.4"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"react-scripts start"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"build"</span><span class="p">:</span><span class="w"> </span><span class="s2">"react-scripts build"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"test"</span><span class="p">:</span><span class="w"> </span><span class="s2">"react-scripts test --env=jsdom"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"eject"</span><span class="p">:</span><span class="w"> </span><span class="s2">"react-scripts eject"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+<p><code class="highlighter-rouge">package.json</code>파일을 얼여보면 이상하리 만큼 단순한 것을 확인할 수 있다. dependency가 3개 밖에 없고, devDependency도 없다. 하지만 <code class="highlighter-rouge">node_modules/</code>폴더를 보면 알 수 있듯이, 내부적으로는 무수히 많은 dependency가 존재한다. 이는 <code class="highlighter-rouge">create-react-app</code>의 특징인데, 모든 설정들이 캡슐화 되어있다. 사용자로 하여금 설정들을 건들지 못하도록 실제 <code class="highlighter-rouge">package.json</code>을 숨겨두고, <code class="highlighter-rouge">webpack</code>설정과 관련된 부분들도 모두 숨겨두었다. 한마디로 개발자들이 소스코드에만 집중할 수 있도록 배려해 놓았다. <code class="highlighter-rouge">scripts</code>설정에 보면 사용할 수 있는 명령어 중에 <code class="highlighter-rouge">eject</code>라는 명령어를 통해 이러한 봉인을 해제할 수 있으나, 이 포스팅에서는 <code class="highlighter-rouge">create-react-app</code>의 의도대로 소스코드에만 집중해보도록 하겠다.</p>
+
+<h1 id="section">소스코드 작성하기</h1>
+<h2 id="section-1">기존 소스코드 분석</h2>
+<p>엔트리 포인트인 <code class="highlighter-rouge">src/index.js</code>파일을 열어보자.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+import registerServiceWorker from './registerServiceWorker';
+
+ReactDOM.render(&lt;App /&gt;, document.getElementById('root'));
+registerServiceWorker();
+</code></pre>
+</div>
+<p>코드는 <code class="highlighter-rouge">javascript ES6</code> 버전으로 작성되어 있고, <code class="highlighter-rouge">jsx</code>문법도 섞여있다. 이 문법들에 대해 익숙하지 않다면 <a href="https://jsdev.kr/t/es6/2944">이곳</a>과 <a href="https://velopert.com/867">이곳</a>을 참고하자. <code class="highlighter-rouge">ES6</code>문법은 익숙해지면 꽤나 편하게 사용할 수 있고, <code class="highlighter-rouge">jsx</code>문법은 <code class="highlighter-rouge">html</code>에 익숙하다면 그리 어렵지 않게 사용할 수 있다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import React from 'react';
+</code></pre>
+</div>
+<p><code class="highlighter-rouge">jsx</code>문법을 사용하기 위해서는 <code class="highlighter-rouge">react</code>모듈을 import 해야한다. 모든 react 컴포넌트에 필수적인 코드이다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import ReactDOM from 'react-dom';
+</code></pre>
+</div>
+<p><code class="highlighter-rouge">react-dom</code>모듈은 react 앱을 최초 렌더링 하기위해 엔트리 포인트에서 쓰인다. 브라우저 뿐만 아니라 서버사이드용 랜더링 메소드를 지원한다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import './index.css';
+</code></pre>
+</div>
+<p>css파일을 import 구문으로 가져오고 있다. 이는 webpack의 <a href="https://github.com/webpack-contrib/css-loader">css-loader</a>를 활용한 것인데, <code class="highlighter-rouge">create-react-app</code>에서 기본적으로 세팅이 되어있다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import App from './App';
+</code></pre>
+</div>
+<p><code class="highlighter-rouge">App</code>이라는 react 컴포넌트를 가져오는 코드이다. 컴포넌트는 react 웹에서 기본적인 화면을 구성하는 단위이다. 예를들어, 회원 가입 화면에서 button, input, textarea와 같은 것들이 컴포넌트이고, 이러한 컴포넌트들이 구성한 화면 조차도 하나의 컴포넌트이다. react는 이러한 컴포넌트들을 만들고, 조립하는 것을 용이하게 해줌으로써 개발에 편의성을 제공한다. 컴포넌트에 대해서는 뒤에서 더 자세히 설명하겠다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import registerServiceWorker from './registerServiceWorker';
+</code></pre>
+</div>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API">service worker</a>란 네트웍이 느리거나 오프라인인 상태에서도 온라인 인것 처럼 리소스들을 캐싱해서 보여주는 모듈을 뜻한다. <code class="highlighter-rouge">create-react-app</code>에서는 기본으로 구현하여 소스코드에 포함되어있다.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>ReactDOM.render(&lt;App /&gt;, document.getElementById('root'));
+registerServiceWorker();
+</code></pre>
+</div>
+<p><code class="highlighter-rouge">root</code>라는 id를 가진 태그를 찾아서 그 안에 <code class="highlighter-rouge">App</code>컴포넌트를 렌더링시킨다. 이곳이 우리가 만드는 react 웹의 엔트리 포인트인데, 껍데기가 되는 html 파일은 <code class="highlighter-rouge">public/index.html</code>파일이 된다. 이 파일을 열어보면 <code class="highlighter-rouge">root</code>라는 id를 가진 <code class="highlighter-rouge">div</code>태그가 존재함을 확인할 수 있다.</p>
+
+<p>그렇다면 우리가 소스코드를 작성해야 하는 파일은? <code class="highlighter-rouge">App.js</code>파일이 된다. 파일을 열어보자.</p>
+
+<pre><code class="language-jsx">import React, { Component } from 'react';
+import logo from './logo.svg';
+import './App.css';
+
+class App extends Component {
+  render() {
+    return (
+      &lt;div className="App"&gt;
+        &lt;header className="App-header"&gt;
+          &lt;img src={logo} className="App-logo" alt="logo" /&gt;
+          &lt;h1 className="App-title"&gt;Welcome to React&lt;/h1&gt;
+        &lt;/header&gt;
+        &lt;p className="App-intro"&gt;
+          To get started, edit &lt;code&gt;src/App.js&lt;/code&gt; and save to reload.
+        &lt;/p&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+export default App;
+</code></pre>
+<p>모든 react 컴포넌트들은 react 모듈의 <code class="highlighter-rouge">Component</code>클래스를 상속받는다. <code class="highlighter-rouge">Component</code>는 ui를 구성하는 엘리먼트들을 독립적이고 재사용 가능하게 만드는 추상 클래스라고 생각하면 된다. 미리 정의해 둔 메소드들이 있고, 그 메소드들을 override 해서 컴포넌트들을 구현하는데, 그 중에서 화면을 그려주는 <code class="highlighter-rouge">render</code> 메소드는 필수적으로 정의해야 한다. <code class="highlighter-rouge">render</code> 메소드는 반드시 jsx 문법으로 작성한 하나의 엘리먼트를 리턴한다.</p>
+
+<h2 id="state-">state 만들기</h2>
+<p>TODO 웹을 만들기에 앞서서, react Component에서 빠질 수 없는 개념인 <code class="highlighter-rouge">state</code>에 대해 알고 넘어가고자 한다. <code class="highlighter-rouge">state</code>는 컴포넌트의 스코프 안의 지역변수라고 할 수 있다. 이 state가 변경되면 이 state를 참조하고 있는 컴포넌트의 다른 부분들도 영향을 받아 업데이트 된다. 우선 state를 선언부터 해보겠다.</p>
+
+<pre><code class="language-jsx">...
+
+class App extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      todoItems: [] // todo 아이템이 들어갈 배열 선언
+    }
+  }
+  render() {
+    ...
+  }
+}
+
+...
+</code></pre>
+<p>render 함수 위에 constructor를 선언하고, constructor 안에 <code class="highlighter-rouge">this.state</code>를 선언했다. state는 기본적으로 Object의 형태로 선언한다. 여기에서는 todo 아이템이 들어갈 배열을 선언했다. 이 state에 <code class="highlighter-rouge">todo</code> 객체들을 넣을 생각이다.</p>
+
+<h2 id="render--">render 함수 구현하기</h2>
+<p>render 함수는 화면에 그려지는 엘리먼트들을 jsx 문법으로 리턴한다. 우선 할 일을 등록하는 양식이 필요할 것 같다. 간단하게 할 일을 입력할 수 있는 <code class="highlighter-rouge">input</code>과 <code class="highlighter-rouge">button</code>을 만들어보자. 스타일도 포기할 수 없으니 css는 <a href="https://getbootstrap.com">bootstrap</a>을 사용하도록 해보자.</p>
+
+<h3 id="publicindexhtml">public/index.html</h3>
+<div class="language-html highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;head&gt;</span>
+    ...
+    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"</span> <span class="na">integrity=</span><span class="s">"sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"</span> <span class="na">crossorigin=</span><span class="s">"anonymous"</span><span class="nt">&gt;</span>
+    ...
+  <span class="nt">&lt;/head&gt;</span>
+  ...
+<span class="nt">&lt;/html&gt;</span>
+
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">public/index.html</code>에 bootstrap css를 추가한다.</p>
+
+<h3 id="srcappjs">src/App.js</h3>
+<pre><code class="language-jsx">...
+
+let todoId = 0 // todo 아이템의 id를 증가시키며 저장하는 변수
+
+class App extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      todoItems: [],
+      todoInput: '' // 새 할 일 input의 value를 저장하는 state
+    }
+    this._handleOnClickAddItem = this._handleOnClickAddItem.bind(this)
+    this._handleOnChangeTodoInput = this._handleOnChangeTodoInput.bind(this)
+  }
+
+  _handleOnClickAddItem () {
+    const { todoInput, todoItems } = this.state
+    if (todoInput.length === 0) return alert('내용을 입력해주세요.')
+    const todoItem = {
+      id: todoId++,
+      title: todoInput,
+      isCompleted: false
+    }
+    const newTodoItems = todoItems.slice(0)
+    newTodoItems.push(todoItem)
+    this.setState({ todoItems: newTodoItems, todoInput: '' })
+  }
+
+  _handleOnChangeTodoInput (e) {
+    this.setState({ todoInput: e.target.value })
+  }
+
+  render () {
+    return (
+      &lt;div className='container' style={{ maxWidth: 600, padding: '20px 0' }}&gt;
+        &lt;div className='row'&gt;
+          &lt;div className='col text-center'&gt;
+            &lt;div className='input-group'&gt;
+              &lt;input
+                type='text'
+                className='form-control'
+                placeholder='새로운 할 일을 입력해주세요.'
+                value={this.state.todoInput}
+                onChange={this._handleOnChangeTodoInput}
+                onKeyDown={e =&gt; e.keyCode === 13 ? this._handleOnClickAddItem() : null}
+              /&gt;
+              &lt;div className='input-group-append'&gt;
+                &lt;button
+                  className='btn btn-outline-secondary'
+                  onClick={this._handleOnClickAddItem}
+                &gt;
+                  등록
+                &lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    )
+  }
+}
+
+export default App;
+</code></pre>
+<p>새 할일을 등록할 폼을 작성해보았다. 이 코드만으로도 리액트의 여러가지 문법들과 보편적인 구조를 확인해볼 수 있다.</p>
+
+<ul>
+  <li>
+    <p>스타일링 : jsx 문법에서의 클래스 명은 <code class="highlighter-rouge">className</code>이라는 속성을 사용한다. es6의 <code class="highlighter-rouge">class</code>지정자와 겹치기 때문이다. 따라서 기존 레가시 html을 복사 붙여넣기 할 경우 class 속성이 그대로 남아있으면 스타일이 먹지 않으므로 주의해야 한다. 인라인 스타일의 경우에는 javascript object 형태로 입력해야 한다. jsx 문법에서 javascript를 삽입하기 위해서는 중괄호 <code class="highlighter-rouge"><span class="p">{}</span></code>를 사용하는데, <code class="highlighter-rouge">style</code>속성 내에 javascript object를 넣다 보니 <code class="highlighter-rouge">style={{ maxWidth: 600, padding: '20px 0' }}</code>과 같은 형태가 된다. css 문법의 케밥케이스를 카멜케이스로 옮기는 방식으로 키를 지정하고, 값은 css 문법 그대로 string 타입으로 넣거나, number타입으로 넣어도 된다. number타입일 경우에 단위는 픽셀로 인식이 된다.</p>
+  </li>
+  <li>
+    <p>폼 엘리먼트 : 리액트 컴포넌트는 기본적으로 state와 props의 변화에 따라 새롭게 화면을 랜더링을 한다. (메모리에서 DOM을 비교하여 변경이 되는DOM만 새로 렌더링) <code class="highlighter-rouge">input</code>은 사용자의 키보드 입력이 들어올 때 마다 화면을 새로 렌더링해줘야 하는데, 이를 위해 컴포넌트의 state를 이용한다. 위 예제에서는 <code class="highlighter-rouge">todoInput</code>이라는 state를 만들어주었고, 초기값을 <code class="highlighter-rouge">''</code>로 설정했다. 그리고 <code class="highlighter-rouge">input</code>태그의 <code class="highlighter-rouge">value</code>속성에 <code class="highlighter-rouge">todoInput</code>을 할당해주었다. 또한 <code class="highlighter-rouge">input</code>태그의 <code class="highlighter-rouge">onChange</code>이벤트에 <code class="highlighter-rouge">this._handleOnChangeTodoInput</code>메소드를 할당하여 키보드 입력 시에 <code class="highlighter-rouge">todoInput</code> state를 변경하도록 했다. 리액트에서 하나의 <code class="highlighter-rouge">input</code>태그가 작동하려면 이러한 일련의 과정을 거쳐야한다. (조금 복잡하다고 생각할 수도 있지만 간편하게 사용할 수 있는 폼 컨트롤과 관련된 라이브러리들을 사용하면 되므로 너무 걱정하지 말자. 원리를 이해하기 위한 과정일 뿐이다.)</p>
+  </li>
+  <li>
+    <p>이벤트바인딩 : <code class="highlighter-rouge">input</code>에서 <code class="highlighter-rouge">onChange</code>속성을 이용하여 DOM과 이벤트를 바인딩한 것 처럼, jsx 태그에 <code class="highlighter-rouge">on****</code>와 같은 속성을 넣어주는 것으로 이벤트와 함수를 바인딩시킬 수 있다. <code class="highlighter-rouge">등록</code>버튼에 <code class="highlighter-rouge">onClick</code>속성을 넣어주어 버튼 클릭 시에 새로운 할 일을 등록하는 함수를 실행한다. 그리고 <code class="highlighter-rouge">input</code>태그에 <code class="highlighter-rouge">onKeyDown</code>속성을 넣어주어 키보드 입력이 엔터키일경우 같은 기능을 수행하도록 했다. class의 멤버 함수를 선언할 때 함수 안에서 <code class="highlighter-rouge">this</code>를 사용하는 경우 <code class="highlighter-rouge">constructor</code>에 <code class="highlighter-rouge">this._handleOnClickAddItem = this._handleOnClickAddItem.bind(this)</code>와 같이 함수에 인스턴스를 바인딩 해주는 것을 잊지말자. (해줘야 하는 경우와 안해도 되는 경우가 있는데, 자세한 설명은 <a href="https://medium.freecodecamp.org/react-binding-patterns-5-approaches-for-handling-this-92c651b5af56">이곳</a>을 참고하자.)</p>
+  </li>
+</ul>
+
+<pre><code class="language-jsx">
+import React, { Component } from 'react';
+
+let todoId = 0 // todo 아이템의 id를 증가시키며 저장하는 변수
+
+class App extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      todoItems: [],
+      todoInput: ''
+    }
+    this._handleOnClickAddItem = this._handleOnClickAddItem.bind(this)
+    this._handleOnChangeTodoInput = this._handleOnChangeTodoInput.bind(this)
+    this._handleOnClickToggleState = this._handleOnClickToggleState.bind(this)
+    this._handleOnClickRemove = this._handleOnClickRemove.bind(this)
+  }
+
+  _handleOnClickAddItem () {
+    const { todoInput, todoItems } = this.state
+    if (todoInput.length === 0) return alert('내용을 입력해주세요.')
+    const todoItem = {
+      id: todoId++,
+      title: todoInput,
+      isCompleted: false
+    }
+    const newTodoItems = todoItems.slice(0)
+    newTodoItems.push(todoItem)
+    this.setState({ todoItems: newTodoItems, todoInput: '' })
+  }
+
+  _handleOnChangeTodoInput (e) {
+    this.setState({ todoInput: e.target.value })
+  }
+
+  _handleOnClickToggleState (index) { // index에 해당하는 아이템의 isCompleted 를 토글한다.
+    const { todoItems } = this.state
+    const newTodoItems = todoItems.slice(0)
+    newTodoItems[index].isCompleted = !todoItems[index].isCompleted
+    this.setState({ todoItems: newTodoItems })
+  }
+
+  _handleOnClickRemove (id) {
+    const { todoItems } = this.state
+    const newTodoItems = todoItems.filter(item =&gt; item.id !== id)
+    this.setState({ todoItems: newTodoItems })
+  }
+
+  render () {
+    const renderCancelButton = item =&gt; (
+      &lt;button
+        className='btn btn-danger btn-sm'
+        style={{ marginLeft: 5 }}
+        onClick={() =&gt; this._handleOnClickRemove(item.id)}
+      &gt;
+        삭제
+      &lt;/button&gt;
+    )
+    return (
+      &lt;div className='container' style={{ maxWidth: 600, padding: '20px 0' }}&gt;
+        &lt;div className='row'&gt;
+          &lt;div className='col text-center'&gt;
+            &lt;div className='input-group'&gt;
+              &lt;input
+                type='text'
+                className='form-control'
+                placeholder='새로운 할 일을 입력해주세요.'
+                value={this.state.todoInput}
+                onChange={this._handleOnChangeTodoInput}
+                onKeyDown={e =&gt; e.keyCode === 13 ? this._handleOnClickAddItem() : null}
+              /&gt;
+              &lt;div className='input-group-append'&gt;
+                &lt;button
+                  className='btn btn-outline-secondary'
+                  onClick={this._handleOnClickAddItem}
+                &gt;
+                  등록
+                &lt;/button&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div className='row' style={ { marginTop: 20 } }&gt;
+          &lt;div className='col-6'&gt;
+            &lt;h3&gt;해야할 일&lt;/h3&gt;
+            {
+              this.state.todoItems.filter(item =&gt; !item.isCompleted).map(item =&gt;
+                &lt;div key={item.id} style={{ margin: 10 }}&gt;
+                  &lt;span style={{ marginRight: 5 }}&gt;- {item.title}&lt;/span&gt;
+                  &lt;button
+                    className='btn btn-success btn-sm'
+                    onClick={() =&gt; this._handleOnClickToggleState(item.id)}
+                  &gt;
+                    완료
+                  &lt;/button&gt;
+                  {renderCancelButton(item)}
+                &lt;/div&gt;
+              )
+            }
+          &lt;/div&gt;
+          &lt;div className='col-6'&gt;
+            &lt;h3&gt;완료한 일&lt;/h3&gt;
+            {
+              this.state.todoItems.filter(item =&gt; item.isCompleted).map(item =&gt;
+                &lt;div key={item.id} style={{ margin: 10 }}&gt;
+                  &lt;span style={{ marginRight: 5 }}&gt;- {item.title}&lt;/span&gt;
+                  &lt;button
+                    className='btn btn-warning btn-sm'
+                    onClick={() =&gt; this._handleOnClickToggleState(item.id)}
+                  &gt;
+                    취소
+                  &lt;/button&gt;
+                  {renderCancelButton(item)}
+                &lt;/div&gt;
+              )
+            }
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+export default App;
+
+</code></pre>
+
+<p>등록된 최종적인 소스이다. <code class="highlighter-rouge">render</code>메소드 안에서 중복되는 엘리먼트들은 <code class="highlighter-rouge">renderCancelButton</code>함수처럼 함수로 지정하여 사용할 수도 있다. 하지만 이 방법은 <code class="highlighter-rouge">render</code>함수가 호출될 때 마다(화면을 다시 렌더링 할 때 마다) 쓸 데 없이 함수를 다시 선언하는 과정을 거치니 앞으로는 멤버함수(<code class="highlighter-rouge">this._renderCancelButton</code>와 같은 방식)로 선언해주도록 하자. 아래와 같이 잘 작동되면 성공!!</p>
+
+<p><img src="/assets/posts/create-react-app_TODO_1.gif" alt="실행화면" /></p>
+
+<p>다음 포스팅에서는 내부 엘리먼트들을 리액트 컴포넌트로 분리해보도록 하겠다.
+전체 소스는 <a href="https://github.com/eunvanz/create-react-app-todo-1">이곳</a>에 공유되어있다.</p>
+
+</article>
+
+
+
+<section class="tags">
+  <strong>Tags:</strong> <a href="/tag/react">react</a>,&nbsp;<a href="/tag/create-react-app">create-react-app</a>
+</section>
+
+
+
+<section class="rss">
+  <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+</section>
+
+<section class="share">
+  <span>Share: </span>
+  
+    
+    
+      <a href="//twitter.com/share?text=%5BReact%5D+create-react-app%EC%9C%BC%EB%A1%9C+%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8+%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0&url=https%3A%2F%2Feunvanz.github.io%2Freact%2F2018%2F06%2F05%2FReact-create-react-app%25EC%259C%25BC%25EB%25A1%259C-%25ED%2594%2584%25EB%25A1%259C%25EC%25A0%259D%25ED%258A%25B8-%25EC%258B%259C%25EC%259E%2591%25ED%2595%2598%25EA%25B8%25B0%2F&via="
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+        <i class="fa fa-twitter-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+      <a href="//www.facebook.com/sharer.php?t=%5BReact%5D+create-react-app%EC%9C%BC%EB%A1%9C+%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8+%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0&u=https%3A%2F%2Feunvanz.github.io%2Freact%2F2018%2F06%2F05%2FReact-create-react-app%25EC%259C%25BC%25EB%25A1%259C-%25ED%2594%2584%25EB%25A1%259C%25EC%25A0%259D%25ED%258A%25B8-%25EC%258B%259C%25EC%259E%2591%25ED%2595%2598%25EA%25B8%25B0%2F"
+        onclick="window.open(this.href, 'facebook-share', 'width=550,height=255');return false;">
+        <i class="fa fa-facebook-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+    
+    
+    
+      <a href="//plus.google.com/share?title=%5BReact%5D+create-react-app%EC%9C%BC%EB%A1%9C+%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8+%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0&url=https%3A%2F%2Feunvanz.github.io%2Freact%2F2018%2F06%2F05%2FReact-create-react-app%25EC%259C%25BC%25EB%25A1%259C-%25ED%2594%2584%25EB%25A1%259C%25EC%25A0%259D%25ED%258A%25B8-%25EC%258B%259C%25EC%259E%2591%25ED%2595%2598%25EA%25B8%25B0%2F"
+        onclick="window.open(this.href, 'google-plus-share', 'width=550,height=255');return false;">
+        <i class="fa fa-google-plus-square fa-lg"></i>
+      </a>
+    
+    
+    
+    
+    
+  
+</section>
+
+
+
+
+<section class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_shortname = 'civasoul';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+
+</div>
+</div>
+
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h3 class="footer-heading">방구석엔지니어</h3>
+
+    <div class="site-navigation">
+
+      <p><strong>Site Map</strong></p>
+      <ul class="pages">
+        
+        
+          <li class="nav-link"><a href="/about/">About</a>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          <li class="nav-link"><a href="/posts/">개발노트</a>
+        
+        
+        
+        
+      </ul>
+    </div>
+
+    <div class="site-contact">
+
+      <p><strong>Contact</strong></p>
+      <ul class="social-media-list">
+        <li>
+          <a href="mailto:eunvanz@gmail.com">
+            <i class="fa fa-envelope-o"></i>
+            <span class="username">eunvanz@gmail.com</span>
+          </a>
+        </li>
+
+        
+          
+        
+          
+        
+          
+          <li>
+            <a href="https://github.com/eunvanz" title="Fork me on GitHub">
+              <i class="fa fa-github"></i>
+              <span class="username">eunvanz</span>
+            </a>
+          </li>
+          
+        
+          
+          <li>
+            <a href="https://stackoverflow.com/users/6475121/benjamin" title="Answer me on StackOverflow">
+              <i class="fa fa-stack-overflow"></i>
+              <span class="username">benjamin</span>
+            </a>
+          </li>
+          
+        
+          
+        
+
+      </ul>
+    </div>
+
+    <div class="site-signature">
+      <p class="rss-subscribe text"><strong>Subscribe <a href="/feed.xml">via RSS</a></strong></p>
+      <p class="text">밥값하는 그날까지, 삽질은 계속된다.
+</p>
+    </div>
+
+  </div>
+
+</footer>
+
+<!-- Scripts -->
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lightbox2/2.7.1/js/lightbox.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  // Default syntax highlighting
+  hljs.initHighlightingOnLoad();
+
+  // Header
+  var menuToggle = $('#js-mobile-menu').unbind();
+  $('#js-navigation-menu').removeClass("show");
+  menuToggle.on('click', function(e) {
+    e.preventDefault();
+    $('#js-navigation-menu').slideToggle(function(){
+      if($('#js-navigation-menu').is(':hidden')) {
+        $('#js-navigation-menu').removeAttr('style');
+      }
+    });
+  });
+});
+
+</script>
+
+
+
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-108473284-1', 'auto');
+  ga('send', 'pageview', {
+    'page': '/react/2018/06/05/React-create-react-app%EC%9C%BC%EB%A1%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0/',
+    'title': '[React] create-react-app으로 프로젝트 시작하기'
+  });
+</script>
+
+
+
+  </body>
+
+</html>
