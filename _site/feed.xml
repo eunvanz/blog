@@ -6,6 +6,7 @@
 </description>
     <link>https://eunvanz.github.io/</link>
     <atom:link href="https://eunvanz.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+<<<<<<< HEAD
     <pubDate>Tue, 05 Jun 2018 11:12:33 +0900</pubDate>
     <lastBuildDate>Tue, 05 Jun 2018 11:12:33 +0900</lastBuildDate>
     <generator>Jekyll v3.2.1</generator>
@@ -558,6 +559,378 @@ export default UserProfileView
         
         <category>javascript</category>
         
+=======
+    <pubDate>Tue, 05 Jun 2018 00:02:07 +0900</pubDate>
+    <lastBuildDate>Tue, 05 Jun 2018 00:02:07 +0900</lastBuildDate>
+    <generator>Jekyll v3.2.1</generator>
+    
+      <item>
+        <title>[React] Higher Order Component로 form handling 관심사 분리하기</title>
+        <description>&lt;p&gt;&lt;a href=&quot;https://eunvanz.github.io/react/2017/11/05/React-Higher-Order-Component-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0/&quot;&gt;지난 포스팅&lt;/a&gt;에서 Higher Order Component(이하 HOC)에 대해 간략하게나마 알아보았다. 오늘은 좀 더 심화되고 실전적인 예시를 보여주려 한다. 실제로 내가 프로젝트를 진행하면서 부딪혔던 상황에서 어떠한 방식으로 HOC를 적용하여 문제를 해결했는지 좀 더 단순화하여 소개한다.&lt;/p&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;문제 상황&lt;/h1&gt;
+&lt;p&gt;리액트에서 기본적으로 form을 핸들링하는 패턴은 아래와 같다.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;import React from 'react'
+
+class SignUpForm extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      email: '',
+      password: '',
+      passwordConfirm: ''
+    }
+    this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
+  }
+  _handleOnChangeInput (e) {
+    const { name, value } = e.target
+    this.setState({ [name]: value })
+  }
+  render () {
+    const { email, password, passwordConfirm } = this.state
+    &amp;lt;form&amp;gt;
+      &amp;lt;input
+        type='text'
+        name='email'
+        placeholder='이메일주소'
+        value={email}
+        onChange={this._handleOnChangeInput}
+      /&amp;gt;
+      &amp;lt;input
+        type='password'
+        name='password'
+        placeholder='비밀번호'
+        value={password}
+        onChange={this._handleOnChangeInput}
+      /&amp;gt;
+      &amp;lt;input
+        type='password'
+        name='passwordConfirm'
+        placeholder='비밀번호 확인'
+        value={passwordConfirm}
+        onChange={this._handleOnChangeInput}
+      /&amp;gt;
+      &amp;lt;button&amp;gt;Sign Up&amp;lt;/button&amp;gt;
+    &amp;lt;/form&amp;gt;
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;form handling과 관련되지 않은 부분을 생략한다면 View의 코드는 위와 같은 형태일 것이다. 이렇게 한 페이지 작성하는 것은 별 어려움이 없으나, form 요소가 들어가는 페이지가 많을 경우에는 굉장히 귀찮은 작업이다. 때때로 노가다 작업으로 느껴진다. form 요소가 들어가게 되면 항상 공통적으로 작성되는 부분이 존재하기 때문이다. 바로 &lt;code class=&quot;highlighter-rouge&quot;&gt;constructor()&lt;/code&gt; 함수의 &lt;code class=&quot;highlighter-rouge&quot;&gt;this.state...&lt;/code&gt; 부분과, &lt;code class=&quot;highlighter-rouge&quot;&gt;_handleOnChageInput()&lt;/code&gt; 함수이다. 작업을 하다보니 아래와 같은 점에서 문제가 되었다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;this.state&lt;/code&gt;에서 form과 관련된 객체를 따로 뺄 경우, &lt;code class=&quot;highlighter-rouge&quot;&gt;_handleOnChangeInput()&lt;/code&gt; 함수 구현이 많이 귀찮아졌다. 예를들어 &lt;code class=&quot;highlighter-rouge&quot;&gt;this.state.form&lt;/code&gt;이라는 객체를 form의 필드들과 바인딩 시킬경우, &lt;code class=&quot;highlighter-rouge&quot;&gt;this.setState({ form: Object.assign({}, this.state.form, { [name]: value })})&lt;/code&gt;와 같은 식이다. 복잡할 경우에는 &lt;a href=&quot;https://facebook.github.io/immutable-js/&quot;&gt;immutable.js&lt;/a&gt;와 같은 라이브러리를 사용해야 할 경우도 있다.&lt;/li&gt;
+  &lt;li&gt;validation이 필요할 경우에 문제는 더욱 커진다. 노가다 작업이 괴롭다.&lt;/li&gt;
+  &lt;li&gt;필드 수가 많은 경우 전체 코드에서 form handling에 관련된 코드가 차지하는 비중도 커진다.&lt;/li&gt;
+  &lt;li&gt;Pure Component로 작성할 수 있는 간단한 컴포넌트도 state로 인해 생성자와 state를 작성해야 한다.&lt;/li&gt;
+  &lt;li&gt;무엇보다 같은 패턴의 함수들이 여러 컴포넌트에 걸쳐 작성되어야 한다는게 심리적으로 납득하기 힘들다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;위와 같은 이유로 인해 form handling과 관련된 관심사를 분리할 수 있는 HOC를 만들어보기로 했다.&lt;/p&gt;
+
+&lt;h1 id=&quot;form-handling-hoc-&quot;&gt;form handling HOC 구현&lt;/h1&gt;
+
+&lt;p&gt;만들게 될 HOC의 스펙은 다음과 같다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;view에 랜더링되는 form의 각 필드들과 바인딩되는 state를 가지고 있고, 이를 view에 &lt;code class=&quot;highlighter-rouge&quot;&gt;formData&lt;/code&gt;라는 prop으로 전달&lt;/li&gt;
+  &lt;li&gt;view의 input의 &lt;code class=&quot;highlighter-rouge&quot;&gt;onChange&lt;/code&gt; 이벤트에 따라 HOC의 state를 변경해 줄 &lt;code class=&quot;highlighter-rouge&quot;&gt;_handleOnChangeInput&lt;/code&gt; 함수를 가지고 있고, 이를 view에 &lt;code class=&quot;highlighter-rouge&quot;&gt;onChangeInput&lt;/code&gt;이라는 prop으로 전달&lt;/li&gt;
+  &lt;li&gt;HOC 생성 시 &lt;code class=&quot;highlighter-rouge&quot;&gt;formConfig&lt;/code&gt; 객체를 인자로 전달받아 state를 구성 (필드명, 초기값)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;원리만 이해할 수 있도록 아주 간단한 스펙으로 설정해보았다. 실제로는 validation 기능까지 붙여서 프로젝트에 사용하고 있다. 아래 코드가 HOC 코드이다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;withFormData.js&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;import React from 'react'
+import PropTypes from 'prop-types'
+
+export default formConfig =&amp;gt; ComposedComponent =&amp;gt; {
+  class withFormData extends React.Component {
+    constructor (props) {
+      super(props)
+      const initialState = {}
+      formConfig.forEach(config =&amp;gt; {
+        initialState[config.inputName] = config.defaultValue || ''
+      })
+      this.state = initialState
+      this._handleOnChangeInput = this._handleOnChangeInput.bind(this)
+    }
+    _handleOnChangeInput (e) {
+      const { value, name } = e.target
+      this.setState({ [name]: value })
+    }
+    render () {
+      return &amp;lt;ComposedComponent onChangeInput={this._handleOnChangeInput} formData={this.state} {...this.props} /&amp;gt;
+    }
+  }
+  return withFormData
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;아래는 &lt;code class=&quot;highlighter-rouge&quot;&gt;withFormData.js&lt;/code&gt;를 사용하여 &lt;code class=&quot;highlighter-rouge&quot;&gt;SignInView.js&lt;/code&gt;를 감싸는 &lt;code class=&quot;highlighter-rouge&quot;&gt;SignInContainer.js&lt;/code&gt;이다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;SignInContainer.js&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;import withFormData from 'hocs/withFormData'
+import SignInView from '../components/SignInView'
+
+const formConfig = [
+  {
+    inputName: 'email',
+    defaultValue: ''
+  },
+  {
+    inputName: 'password',
+    defaultValue: ''
+  },
+  {
+    inputName: 'passwordConfirm',
+    defaultValue: ''
+  },
+]
+
+const wrappedSignInView = withFormData(formConfig)(SignInView)
+
+export default wrappedSignInView
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;이로 인해 &lt;code class=&quot;highlighter-rouge&quot;&gt;onChangeInput&lt;/code&gt;함수와 &lt;code class=&quot;highlighter-rouge&quot;&gt;formData&lt;/code&gt;라는 state가 &lt;code class=&quot;highlighter-rouge&quot;&gt;SignInView&lt;/code&gt;에 &lt;code class=&quot;highlighter-rouge&quot;&gt;props&lt;/code&gt;로 주입되었다. 이제 이 prop들을 사용하는 View를 만들면 된다. 간단하게 Pure Component로 구현해보겠다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;SignInView.js&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;import { PureComponent } from 'react'
+import PropTypes from 'prop-types'
+
+export default class SignInView extends PureComponent {
+  static propTypes = {
+    formData: PropTypes.object.isRequired,
+    onChangeInput: PropTypes.func.isRequired
+  }
+  render () {
+    const { formData, onChangeInput } = this.props
+    return (
+      &amp;lt;form&amp;gt;
+        &amp;lt;input
+          type='text'
+          name='email'
+          placeholder='이메일주소'
+          value={formData.email}
+          onChange={onChangeInput}
+        /&amp;gt;
+        &amp;lt;input
+          type='password'
+          name='password'
+          placeholder='비밀번호'
+          value={formData.password}
+          onChange={onChangeInput}
+        /&amp;gt;
+        &amp;lt;input
+          type='password'
+          name='passwordConfirm'
+          placeholder='비밀번호 확인'
+          value={formData.passwordConfirm}
+          onChange={onChangeInput}
+        /&amp;gt;
+        &amp;lt;button&amp;gt;Sign Up&amp;lt;/button&amp;gt;
+      &amp;lt;/form&amp;gt;
+    )
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Component대신 PureComponent를 상속하여 &lt;code class=&quot;highlighter-rouge&quot;&gt;shouldComponentUpdate&lt;/code&gt;호출 시 props를 &lt;code class=&quot;highlighter-rouge&quot;&gt;shallowCompare&lt;/code&gt;해주는 컴포넌트를 구현하였다. 이처럼 stateless하게 컴포넌트를 구성하면 코드가 간결해진다. 또한 성능이나 side effect 측면에서도 유리하다. 실제 프로젝트에서는 &lt;code class=&quot;highlighter-rouge&quot;&gt;defaultValue&lt;/code&gt;를 redux store에서 받은 전역 props에서 받아서 설정할 수 있는 부분과, validation 설정 부분이 추가되어서 더욱 복잡해졌지만, 기본적인 골자는 이와 같다. 한 번만 잘 만들어 놓으면 어떤 컴포넌트에서라도 너무나 편리하게 사용할 수 있으니, 나만의 form handling HOC를 꼭 만들어보자.&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 12 Feb 2018 23:44:40 +0900</pubDate>
+        <link>https://eunvanz.github.io/react/2018/02/12/React-Higher-Order-Component%EB%A1%9C-form-handling-%EA%B4%80%EC%8B%AC%EC%82%AC-%EB%B6%84%EB%A6%AC%ED%95%98%EA%B8%B0/</link>
+        <guid isPermaLink="true">https://eunvanz.github.io/react/2018/02/12/React-Higher-Order-Component%EB%A1%9C-form-handling-%EA%B4%80%EC%8B%AC%EC%82%AC-%EB%B6%84%EB%A6%AC%ED%95%98%EA%B8%B0/</guid>
+        
+        <category>react</category>
+        
+        <category>hoc</category>
+        
+        
+        <category>react</category>
+        
+      </item>
+    
+      <item>
+        <title>[React] Higher Order Component 이해하기</title>
+        <description>&lt;h1 id=&quot;higher-order-component-&quot;&gt;Higher Order Component 개요&lt;/h1&gt;
+&lt;p&gt;Higher Order Component (이하 HOC)는 리액트에서 사용되는 일종의 디자인 패턴이다. HOC는 리액트 컴포넌트를 인자로 받아 리액트 컴포넌트를 반환한다. 기본적으로 아래와 같은 형태이다.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;export default ComposedComponent =&amp;gt; {
+  class HOC extends React.Component {
+    const { ...props } = this.props
+    render () {
+      return &amp;lt;ComposedComponent {...props} /&amp;gt;
+    }
+  }
+  return HOC
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;위 코드를 템플릿으로 하여 갖가지 양념을 쳐서 특정한 기능을 수행하는 컴포넌트를 생산할 수 있다. 주로, 여러 컴포넌트에 반복적으로 들어가는 코드들을 HOC에 작성하면 된다. 즉, 여러 컴포넌트들이 가지고 있는 횡단관심사(Cross-cutting concerns)들을 구현하는 컴포넌트가 HOC이다.&lt;/p&gt;
+
+&lt;p&gt;스프링 AOP를 공부하면서 들었던 개념이 횡단관심사라는 개념인데, View에서의 횡단관심사는 감이 잘 잡히지 않는다. View에서의 횡단관심사들은 어떤것들이 있을까? 생각해보면 생각보다 많다. 그리고 실제로 작업을 하다보면 이러한 횡단관심사들이 View에서도 상당히 많다. 일단 생각나는 것을 떠올려보면,&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;유저 인증 로직:&lt;/strong&gt; 사용자가 로그인 상태인지, 권한이 있는 사용자인지에 따라 페이지를 보여주거나, 로그인 페이지로 이동시키거나, 권한이 없다는 안내 메시지를 띄우는 등, 사용자 상태에 따라 분기를 시키는 유저 인증 작업을 HOC에게 위임할 수 있다.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Dumb와 Smart 컴포넌트 분리:&lt;/strong&gt; Redux 패턴에서 권장하는 방식인 Dumb 컴포넌트(Presentational Component)와 Smart 컴포넌트(Container Component)를 분리하는데에 사용되고 있다. &lt;code class=&quot;highlighter-rouge&quot;&gt;react-redux&lt;/code&gt;모듈에서는 &lt;code class=&quot;highlighter-rouge&quot;&gt;connect&lt;/code&gt;라는 HOC를 제공하고 있으며, 이는 Dumb 컴포넌트와 Smart 컴포넌트를 분리할 수 있게 해준다. 이로 인해 컴포넌트의 재사용성과 유지보수 용이성을 높일 수 있다.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;로딩 화면 표시:&lt;/strong&gt; 화면을 띄우기위한 데이터가 로딩 중일 때 로딩 화면을 표시하고, 데이터 로딩이 완료됐을 때 인자로 받은 컴포넌트를 보여주도록 하는 로직을 HOC가 담당하게 할 수 있다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;이러한 것들을 쉽게 떠올릴 수 있다. 좀 더 복잡하게 사용하면 폼 데이터와 state의 바인딩 등과 같이 더욱 다양한 상황에서 사용할 수 있다.&lt;/p&gt;
+
+&lt;h1 id=&quot;higher-order-component--1&quot;&gt;Higher Order Component 구현&lt;/h1&gt;
+&lt;p&gt;간단하게 HOC를 구현해 보는 예제이다. 사용자 로그인 상태일경우 페이지를 정상적으로 보여주고, 로그인이 돼있지 않을 경우 로그인 페이지로 이동하는 로직을 갖고 있는 HOC를 구현해보겠다.&lt;/p&gt;
+
+&lt;p&gt;그 전에 몇 가지 가정이 필요하다. 아래는 현재 내가 실제로 진행하고 있는 프로젝트의 환경과 같다.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;사용자가 로그인 상태일 경우에는 redux store의 state에 user라는 키값으로 user 객체가 존재&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;needAuth.js:&lt;/strong&gt; 로그인 여부에 따라 페이지 이동 처리를 하는 HOC로, 로그인 상태가 아닐 시 &lt;code class=&quot;highlighter-rouge&quot;&gt;/sign-in&lt;/code&gt; route로 이동&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;UserProfileContainer.js:&lt;/strong&gt; redux store와 뷰를 연결짓는 container 컴포넌트&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;UserProfileView.js:&lt;/strong&gt; 사용자 자신의 프로필을 조회하는 presentational 컴포넌트&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;needAuth.js:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+
+export default ComposedComponent =&amp;gt; {
+  class needAuth extends React.Component {
+    componentDidMount () {
+      const { user } = this.props
+      if (!user) this.context.router.push('/sign-in')
+    }
+    render () {
+      const { user, ...props } = this.props
+      if (!user) return &amp;lt;div&amp;gt;로그인 처리 중...&amp;lt;/div&amp;gt;
+      return &amp;lt;ComposedComponent user={user} {...props} /&amp;gt;
+    }
+  }
+  needAuth.contextTypes = {
+    router: PropTypes.object.isRequired
+  }
+  needAuth.propTypes = {
+    user: PropTypes.object
+  }
+  const mapStateToProps = state =&amp;gt; {
+    return {
+      user: state.user
+    }
+  }
+  return connect(mapStateToProps, null)(needAuth)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;UserProfileContainer.js:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;import UserProfileView from '../components/UserProfileView'
+import needAuth from 'hocs/needAuth'
+
+export default needAuth(UserProfileView)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;UserProfileView.js:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-jsx&quot;&gt;import React from 'react'
+import PropTypes from 'prop-types'
+
+class UserProfileView extends React.Component {
+  render () {
+    const { user } = this.props
+    return (
+      &amp;lt;div&amp;gt;
+        &amp;lt;p&amp;gt;name: {user.name}&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;mobile: {user.mobile}&amp;lt;/p&amp;gt;
+        &amp;lt;p&amp;gt;hobby: {user.hobby}&amp;lt;/p&amp;gt;
+      &amp;lt;div&amp;gt;
+    )
+  }
+}
+UserProfileView.propTypes = {
+  user: PropTypes.object.isRequired
+}
+export default UserProfileView
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;위와 같이 간단하게 HOC를 만들고 적용해보았다. 실제 프로젝트에 적용한 결과 아주 잘 작동한다.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 05 Feb 2018 22:31:38 +0900</pubDate>
+        <link>https://eunvanz.github.io/react/2018/02/05/React-Higher-Order-Component-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0/</link>
+        <guid isPermaLink="true">https://eunvanz.github.io/react/2018/02/05/React-Higher-Order-Component-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0/</guid>
+        
+        <category>react</category>
+        
+        <category>hoc</category>
+        
+        
+        <category>react</category>
+        
+      </item>
+    
+      <item>
+        <title>ES6에서 Promise를 순차적으로 실행하기</title>
+        <description>&lt;p&gt;Promise는 javascript의 비동기 호출 시 펼쳐지는 callback지옥을 해소할 수 있는 아주 유용한 ES6 객체이다. 현재 존재하는 Promise의 함수 중에서 여러 Promise 함수들을 한꺼번에 handling 할 수 있도록 해주는 함수로 &lt;code class=&quot;highlighter-rouge&quot;&gt;Promise.all()&lt;/code&gt;이라는 함수가 있지만, 이 함수는 Promise 함수들을 순차적으로 실행시켜 주지는 않는다.&lt;/p&gt;
+
+&lt;p&gt;예를 들어, 정렬되어 있는 순서대로 순차적으로 DB에 입력되어야 하는 &lt;code class=&quot;highlighter-rouge&quot;&gt;items&lt;/code&gt;라는 Object 배열이 있다. 순차적으로 DB에 입력한다는 조건을 무시한다면 &lt;code class=&quot;highlighter-rouge&quot;&gt;Promise.all()&lt;/code&gt;을 사용하여 아래와 같이 코드를 짤 수 있을 것이다.&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;axios&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'axios'&lt;/span&gt;
+&lt;span class=&quot;kr&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;API_BASE_URL&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'./constant'&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'firstItem'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'secondItem'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'thirdItem'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'fourthItem'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;postItem&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;item&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;axios&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;post&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;`&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;API_BASE_URL&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/item`, item&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;)
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kr&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;promArr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;item&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;postItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;Promise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;all&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;promArr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// 성공 후 처리&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;위 코드는 얼핏보면 정렬된 &lt;code class=&quot;highlighter-rouge&quot;&gt;items&lt;/code&gt;에 대하여 순차적으로 &lt;code class=&quot;highlighter-rouge&quot;&gt;postItem&lt;/code&gt;함수가 호출되고 db에 순차적으로 입력될 것 같지만, 각 함수들은 병렬적으로 실행되어 결국에는 뒤죽박죽으로 입력된다. 비동기이기 때문에 각 함수들이 수행되는 시간이 일정하지 않기 때문이다. 즉, 순서가 보장되지 않는다. 순서를 보장하기 위해서는 아래와 같이 코드를 고쳐야 한다.&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;postItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;postItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;postItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;postItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// 성공 후 처리&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;하지만, 이 코드는 &lt;code class=&quot;highlighter-rouge&quot;&gt;items&lt;/code&gt;의 length가 클 경우에 사용할 수가 없다.&lt;/p&gt;
+
+&lt;h1 id=&quot;reduce---promise--&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;reduce()&lt;/code&gt;를 활용하여 순차적으로 Promise 함수 실행하기&lt;/h1&gt;
+&lt;p&gt;이 문제는 &lt;code class=&quot;highlighter-rouge&quot;&gt;Array.prototype.reduce()&lt;/code&gt;함수를 활용하면 간단히 해결 가능하다. &lt;code class=&quot;highlighter-rouge&quot;&gt;Array.prototype.reduce()&lt;/code&gt;함수의 자세한 설명은 &lt;a href=&quot;https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce&quot;&gt;이곳&lt;/a&gt;을 참고하자.&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;reduce&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;prevProm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;prevProm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;postItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;item&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Promise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;resolve&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// 성공 후 처리&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;이와 같은 방법으로 아주 간단하게 순차적으로 여러 Promise 함수를 처리할 수 있다.&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 30 Jan 2018 00:18:26 +0900</pubDate>
+        <link>https://eunvanz.github.io/javascript/2018/01/30/ES6%EC%97%90%EC%84%9C-Promise%EB%A5%BC-%EC%88%9C%EC%B0%A8%EC%A0%81%EC%9C%BC%EB%A1%9C-%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0/</link>
+        <guid isPermaLink="true">https://eunvanz.github.io/javascript/2018/01/30/ES6%EC%97%90%EC%84%9C-Promise%EB%A5%BC-%EC%88%9C%EC%B0%A8%EC%A0%81%EC%9C%BC%EB%A1%9C-%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0/</guid>
+        
+        <category>javascript</category>
+        
+>>>>>>> cb561a6ae65fe4e0f5838f89a11a121340d83231
         <category>es6</category>
         
         
@@ -637,8 +1010,13 @@ $ git push -u origin source
 
 </description>
         <pubDate>Mon, 29 Jan 2018 21:08:55 +0900</pubDate>
+<<<<<<< HEAD
         <link>https://eunvanz.github.io/jekyll/2018/01/29/github-%EB%B8%94%EB%A1%9C%EA%B7%B8%EC%97%90%EC%84%9C-Jekyll-%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0.html</link>
         <guid isPermaLink="true">https://eunvanz.github.io/jekyll/2018/01/29/github-%EB%B8%94%EB%A1%9C%EA%B7%B8%EC%97%90%EC%84%9C-Jekyll-%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0.html</guid>
+=======
+        <link>https://eunvanz.github.io/jekyll/2018/01/29/github-%EB%B8%94%EB%A1%9C%EA%B7%B8%EC%97%90%EC%84%9C-Jekyll-%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link>
+        <guid isPermaLink="true">https://eunvanz.github.io/jekyll/2018/01/29/github-%EB%B8%94%EB%A1%9C%EA%B7%B8%EC%97%90%EC%84%9C-Jekyll-%ED%94%8C%EB%9F%AC%EA%B7%B8%EC%9D%B8-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid>
+>>>>>>> cb561a6ae65fe4e0f5838f89a11a121340d83231
         
         <category>jekyll</category>
         
